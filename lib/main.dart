@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:graphx/graphx.dart';
 
 import 'ui/ui.dart';
 
@@ -18,15 +19,85 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: kDebugMode,
       title: 'Flutter Demo',
-      themeMode: ThemeMode.light,
-      theme: ThemeData.light().copyWith(
-        primaryColor: Color(0xFF181D3D),
-        textTheme: GoogleFonts.robotoTextTheme(),
-      ),
-      darkTheme: ThemeData.dark().copyWith(
-        primaryColor: Color(0xFF181D3D),
-        textTheme: GoogleFonts.robotoTextTheme(),
-      ),
+      themeMode: ThemeMode.system,
+      theme: ThemeData.light()
+        ..copyWith(
+          textTheme: GoogleFonts.robotoTextTheme()
+            ..copyWith(
+              headline1: TextStyle(
+                color: Colors.black,
+              ),
+              headline2: TextStyle(
+                color: Colors.black,
+              ),
+              headline3: TextStyle(
+                color: Colors.black,
+              ),
+              headline4: TextStyle(
+                color: Colors.black,
+              ),
+              headline5: TextStyle(
+                color: Colors.black,
+              ),
+              headline6: TextStyle(
+                color: Colors.black,
+              ),
+              bodyText1: TextStyle(
+                color: Colors.black,
+              ),
+              bodyText2: TextStyle(
+                color: Colors.black,
+              ),
+              caption: TextStyle(
+                color: Colors.black,
+              ),
+              subtitle1: TextStyle(
+                color: Colors.black,
+              ),
+              subtitle2: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+        ),
+      darkTheme: ThemeData.dark()
+        ..copyWith(
+          textTheme: GoogleFonts.robotoTextTheme()
+            ..copyWith(
+              headline1: TextStyle(
+                color: Colors.white,
+              ),
+              headline2: TextStyle(
+                color: Colors.white,
+              ),
+              headline3: TextStyle(
+                color: Colors.white,
+              ),
+              headline4: TextStyle(
+                color: Colors.white,
+              ),
+              headline5: TextStyle(
+                color: Colors.white,
+              ),
+              headline6: TextStyle(
+                color: Colors.white,
+              ),
+              bodyText1: TextStyle(
+                color: Colors.white,
+              ),
+              bodyText2: TextStyle(
+                color: Colors.white,
+              ),
+              caption: TextStyle(
+                color: Colors.white,
+              ),
+              subtitle1: TextStyle(
+                color: Colors.white,
+              ),
+              subtitle2: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+        ),
       initialBinding: BindingsBuilder.put(() => OnboardingController()),
       home: OnBoardingPage(),
     );

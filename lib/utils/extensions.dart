@@ -107,8 +107,8 @@ extension ExtendedDouble on double {
 }
 
 extension ExtendedWidget on Widget {
-  Future get to => Get.to(this);
-  Future get offAll => Get.offAll(this);
+  Future to([Bindings bindings]) => Get.to(this, binding: bindings);
+  Future offAll([Bindings bindings]) => Get.offAll(this, binding: bindings);
   Future get off => Get.off(this);
   Future openDIALOG() => openDialog(
         child: this,
