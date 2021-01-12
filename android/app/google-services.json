@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "779669353294",
+    "project_id": "chat-app-1b49e",
+    "storage_bucket": "chat-app-1b49e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:779669353294:android:6e55d29a0dbc483556a41f",
+        "android_client_info": {
+          "package_name": "com.ismail.firebase_chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "779669353294-ee7np7dmpb3idjoevo8ku2343iqbsolh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNZbxr7nK3EwY1qNaNDD-OF7FNwRI3oqs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "779669353294-ee7np7dmpb3idjoevo8ku2343iqbsolh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
