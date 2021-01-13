@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: kDebugMode,
-      title: 'Flutter Demo',
+      title: 'Ismail Chat App',
       themeMode: ThemeMode.system,
       theme: ThemeData(
         primaryColor: Color(0xFF22AD5C),

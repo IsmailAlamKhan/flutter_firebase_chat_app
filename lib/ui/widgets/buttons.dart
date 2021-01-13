@@ -1,7 +1,12 @@
-import 'package:firebase_chat_app/ui/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import 'package:firebase_chat_app/ui/ui.dart';
 import 'package:firebase_chat_app/utils/utils.dart';
+
+const String LOGINTAG = 'LOGIN';
+const String REGTAG = 'Register';
+const String FORGOTTAG = 'Forgot Password';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
@@ -14,14 +19,14 @@ class CustomButton extends StatelessWidget {
   final String tag;
   CustomButton.login({@required this.onTap})
       : text = 'Login',
-        tag = 'Login';
+        tag = LOGINTAG;
   CustomButton.regiser({@required this.onTap})
       : text = 'Register',
-        tag = 'Register';
+        tag = REGTAG;
 
   CustomButton.forgotPass({@required this.onTap})
       : text = 'Forgot Password',
-        tag = 'Forgot Password';
+        tag = FORGOTTAG;
 
   final VoidCallback onTap;
   final String text;
@@ -63,6 +68,7 @@ class CustomButton extends StatelessWidget {
 class RoundedLoadingButton extends StatelessWidget {
   const RoundedLoadingButton({
     Key key,
+    this.tag,
     @required this.width,
     @required this.height,
     @required this.onTap,
@@ -70,7 +76,7 @@ class RoundedLoadingButton extends StatelessWidget {
     @required this.submitState,
     @required this.animDuration,
   }) : super(key: key);
-
+  final String tag;
   final double width;
   final double height;
   final Function onTap;
@@ -111,6 +117,17 @@ class RoundedLoadingButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (tag != null) {
+      return Hero(
+        tag: tag,
+        child: _build(context),
+      );
+    } else {
+      _build(context);
+    }
+  }
+
+  AnimatedContainer _build(BuildContext context) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 500),
       curve: Curves.bounceInOut,

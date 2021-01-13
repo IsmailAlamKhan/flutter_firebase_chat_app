@@ -30,14 +30,53 @@ class Auth extends GetView<LoginController> {
   }
 
   Widget _buildSubmitButton(AuthState state) {
-    return Obx(() => RoundedLoadingButton(
-          onTap: _submit,
-          width: controller.submitButtonWidth,
-          height: 40,
-          title: controller.submitButtonTitle,
-          animDuration: 500.milliseconds,
-          submitState: controller.submitState,
-        ));
+    switch (state) {
+      case AuthState.Login:
+        return Obx(
+          () => RoundedLoadingButton(
+            tag: LOGINTAG,
+            onTap: _submit,
+            width: controller.submitButtonWidth,
+            height: 40,
+            title: controller.submitButtonTitle,
+            animDuration: 500.milliseconds,
+            submitState: controller.submitState,
+          ),
+        );
+
+        break;
+      case AuthState.ForgotPass:
+        return Obx(
+          () => RoundedLoadingButton(
+            tag: FORGOTTAG,
+            onTap: _submit,
+            width: controller.submitButtonWidth,
+            height: 40,
+            title: controller.submitButtonTitle,
+            animDuration: 500.milliseconds,
+            submitState: controller.submitState,
+          ),
+        );
+
+        break;
+      case AuthState.Registration:
+        return Obx(
+          () => RoundedLoadingButton(
+            tag: REGTAG,
+            onTap: _submit,
+            width: controller.submitButtonWidth,
+            height: 40,
+            title: controller.submitButtonTitle,
+            animDuration: 500.milliseconds,
+            submitState: controller.submitState,
+          ),
+        );
+
+        break;
+      default:
+        return SizedBox.shrink();
+        break;
+    }
   }
 
   @override
@@ -76,16 +115,20 @@ class Auth extends GetView<LoginController> {
                         position: controller.usernameSlideAnimation,
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: 20.0),
-                          child: DefaultTextField(
-                            decoration:
-                                InputDecoration(prefixIcon: Icon(Icons.person)),
-                            focusNode: usernameFocusNode,
-                            textInputAction: TextInputAction.next,
-                            onFieldSubmitted: (_) =>
-                                emailFocusNode.requestFocus(),
-                            tec: controller.usernameTec,
-                            label: 'Username',
-                            mandatory: true,
+                          child: Obx(
+                            () => controller.authState.register
+                                ? DefaultTextField(
+                                    decoration: InputDecoration(
+                                        prefixIcon: Icon(Icons.person)),
+                                    focusNode: usernameFocusNode,
+                                    textInputAction: TextInputAction.next,
+                                    onFieldSubmitted: (_) =>
+                                        emailFocusNode.requestFocus(),
+                                    tec: controller.usernameTec,
+                                    label: 'Username',
+                                    mandatory: true,
+                                  )
+                                : SizedBox.shrink(),
                           ),
                         ),
                       ),
@@ -114,19 +157,19 @@ class Auth extends GetView<LoginController> {
                         child: Padding(
                           padding:
                               const EdgeInsets.only(top: 20.0, bottom: 20.0),
-                          child: Obx(
-                            () => DefaultTextField.password(
-                              false,
-                              focusNode: passFocusNode,
-                              textInputAction: TextInputAction.next,
-                              tec: controller.passTec,
-                              onFieldSubmitted: (_) =>
-                                  conPassFocusNode.requestFocus(),
-                              hidePass: () => controller.obscure(true),
-                              showPass: () => controller.obscure(false),
-                              obscure: controller.obscure.value,
-                            ),
-                          ),
+                          child: Obx(() => !controller.authState.forgotPass
+                              ? DefaultTextField.password(
+                                  false,
+                                  focusNode: passFocusNode,
+                                  textInputAction: TextInputAction.next,
+                                  tec: controller.passTec,
+                                  onFieldSubmitted: (_) =>
+                                      conPassFocusNode.requestFocus(),
+                                  hidePass: () => controller.obscure(true),
+                                  showPass: () => controller.obscure(false),
+                                  obscure: controller.obscure.value,
+                                )
+                              : SizedBox.shrink()),
                         ),
                       ),
                     ),
@@ -136,20 +179,25 @@ class Auth extends GetView<LoginController> {
                         position: controller.conPassSlideAnimation,
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: 20.0),
-                          child: DefaultTextField.password(
-                            true,
-                            tec: controller.conPassTec,
-                            focusNode: conPassFocusNode,
-                            validator: (value) {
-                              if (value != controller.passTec.text) {
-                                return 'Password mismatch';
-                              } else {
-                                return null;
-                              }
-                            },
-                            hidePass: () => controller.conObscure(true),
-                            showPass: () => controller.conObscure(false),
-                            obscure: controller.conObscure.value,
+                          child: Obx(
+                            () => controller.authState.register
+                                ? DefaultTextField.password(
+                                    true,
+                                    tec: controller.conPassTec,
+                                    focusNode: conPassFocusNode,
+                                    validator: (value) {
+                                      if (value != controller.passTec.text) {
+                                        return 'Password mismatch';
+                                      } else {
+                                        return null;
+                                      }
+                                    },
+                                    hidePass: () => controller.conObscure(true),
+                                    showPass: () =>
+                                        controller.conObscure(false),
+                                    obscure: controller.conObscure.value,
+                                  )
+                                : SizedBox.shrink(),
                           ),
                         ),
                       ),

@@ -1,8 +1,10 @@
 import 'package:firebase_chat_app/statemangement/statemangement.dart';
 import 'package:firebase_chat_app/ui/pages/auth/auth.dart';
+import 'package:firebase_chat_app/ui/ui.dart';
 import 'package:firebase_chat_app/utils/utils.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:graphx/graphx.dart';
 
 enum SubmitState {
   Loading,
@@ -50,7 +52,7 @@ class LoginController extends GetxController with SingleGetTickerProviderMixin {
   Future<void> submit() async {
     try {
       _submitState(SubmitState.Loading);
-      await 500.milliseconds.delay();
+      await 300.milliseconds.delay();
       await _authController.doAuth(
         authState,
         username: usernameTec.text,
@@ -64,6 +66,7 @@ class LoginController extends GetxController with SingleGetTickerProviderMixin {
       _submitState(SubmitState.Success);
       await 1000.milliseconds.delay();
       _submitState(SubmitState.Idle);
+      Home().offAll();
     } catch (e) {
       _submitState(SubmitState.Error);
       showErrorSnackBar(body: e.toString());
@@ -110,7 +113,7 @@ class LoginController extends GetxController with SingleGetTickerProviderMixin {
 
   AnimationController get initAnimController {
     return AnimationController(
-      duration: 500.milliseconds,
+      duration: 300.milliseconds,
       vsync: this,
     );
   }
@@ -188,10 +191,15 @@ class LoginController extends GetxController with SingleGetTickerProviderMixin {
     emailSlideAnimation = initOffsetAnims.animate(
       offsetCurveAnimations(emailSlideController),
     );
-    authStateOnChange(_authState.value);
     _submitWorker = ever(_submitState, submitStateOnChange);
     _authStateWorker = ever(_authState, authStateOnChange);
     super.onInit();
+  }
+
+  @override
+  onReady() {
+    authStateOnChange(_authState.value);
+    super.onReady();
   }
 
   Future<void> changeToLogin() async {
@@ -199,20 +207,20 @@ class LoginController extends GetxController with SingleGetTickerProviderMixin {
     _authStateChangeButtonTitle('Registration');
 
     emailSizeController.forward();
-    await 500.milliseconds.delay();
+    await 300.milliseconds.delay();
     emailSlideController.forward();
 
     passSizeController.forward();
-    await 500.milliseconds.delay();
+    await 300.milliseconds.delay();
     passSlideController.forward();
 
     forgotPassButtonController.forward();
     usernameSlideController.reverse();
-    await 500.milliseconds.delay();
+    await 300.milliseconds.delay();
     usernameSizeController.reverse();
 
     conPassSlideController.reverse();
-    await 500.milliseconds.delay();
+    await 300.milliseconds.delay();
     conPassSizeController.reverse();
   }
 
@@ -221,19 +229,19 @@ class LoginController extends GetxController with SingleGetTickerProviderMixin {
     _authStateChangeButtonTitle('Back');
 
     usernameSizeController.forward();
-    await 500.milliseconds.delay();
+    await 300.milliseconds.delay();
     usernameSlideController.forward();
 
     emailSizeController.forward();
-    await 500.milliseconds.delay();
+    await 300.milliseconds.delay();
     emailSlideController.forward();
 
     passSizeController.forward();
-    await 500.milliseconds.delay();
+    await 300.milliseconds.delay();
     passSlideController.forward();
 
     conPassSizeController.forward();
-    await 500.milliseconds.delay();
+    await 300.milliseconds.delay();
     conPassSlideController.forward();
 
     forgotPassButtonController.forward();
@@ -245,15 +253,15 @@ class LoginController extends GetxController with SingleGetTickerProviderMixin {
 
     forgotPassButtonController.reverse();
     passSlideController.reverse();
-    await 500.milliseconds.delay();
+    await 300.milliseconds.delay();
     passSizeController.reverse();
 
     usernameSlideController.reverse();
-    await 500.milliseconds.delay();
+    await 300.milliseconds.delay();
     usernameSizeController.reverse();
 
     conPassSlideController.reverse();
-    await 500.milliseconds.delay();
+    await 300.milliseconds.delay();
     conPassSizeController.reverse();
   }
 
@@ -268,6 +276,7 @@ class LoginController extends GetxController with SingleGetTickerProviderMixin {
   }
 
   void authStateOnChange(AuthState val) {
+    trace(val);
     switch (val) {
       case AuthState.Login:
         changeToLogin();
