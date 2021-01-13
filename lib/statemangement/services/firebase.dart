@@ -14,6 +14,9 @@ class FirebaseService<T extends BaseModel> extends GetxService {
   String firebaseErrors(String errorCode) {
     String message;
     switch (errorCode) {
+      case 'invalid-email':
+        message = 'The email is badly formatted.';
+        break;
       case 'unauthorized-domain':
         message = 'This domain is not authorized for OAuth.';
         break;
@@ -92,43 +95,51 @@ class FirebaseService<T extends BaseModel> extends GetxService {
 
   static FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  void crud(
+  Future<void> crud(
     CrudState crudState, {
     Map<String, dynamic> data,
     @required String collection,
     @required T model,
-  }) {
+    bool wantLoading = true,
+  }) async {
     if (crudState != CrudState.delete && data == null)
       throw Exception('You need to provide data if you are updating or adding');
-    showLoadingWithProggress(
-      afterStarted: () async {
-        try {
-          String _crudMessege = '';
-          switch (crudState) {
-            case CrudState.add:
-              _crudMessege = 'Added';
-              await _firestore.collection(collection).add(data);
-              break;
-            case CrudState.update:
-              _crudMessege = 'Updated';
-              await _firestore.collection(collection).doc(model.id).set(data);
-              break;
-            case CrudState.delete:
-              _crudMessege = 'Deleted';
-              await _firestore.collection(collection).doc(model.id).delete();
-              break;
-            default:
-          }
-          showSuccessSnackBar(
-            body:
-                "${model.runtimeType?.convertToString} Successfully $_crudMessege",
-          );
-        } on FirebaseException catch (e) {
-          showErrorSnackBar(body: firebaseErrors(e.code));
-        }
-      },
-      wantProggress: false,
-    );
+    if (wantLoading) {
+      await showLoadingWithProggress(
+        afterStarted: () async {},
+        wantProggress: false,
+      );
+    } else {
+      await _crud(crudState, collection, data, model);
+    }
+  }
+
+  Future _crud(CrudState crudState, String collection,
+      Map<String, dynamic> data, model) async {
+    try {
+      String _crudMessege = '';
+      switch (crudState) {
+        case CrudState.add:
+          _crudMessege = 'Added';
+          await _firestore.collection(collection).add(data);
+          break;
+        case CrudState.update:
+          _crudMessege = 'Updated';
+          await _firestore.collection(collection).doc(model.id).set(data);
+          break;
+        case CrudState.delete:
+          _crudMessege = 'Deleted';
+          await _firestore.collection(collection).doc(model.id).delete();
+          break;
+        default:
+      }
+      showSuccessSnackBar(
+        body:
+            "${model.runtimeType?.convertToString} Successfully $_crudMessege",
+      );
+    } on FirebaseException catch (e) {
+      showErrorSnackBar(body: firebaseErrors(e.code));
+    }
   }
 
   Stream<List<T>> getListStream([ListQuery<T> returnVal, String collection]) =>
@@ -146,5 +157,5 @@ class FirebaseService<T extends BaseModel> extends GetxService {
 }
 
 abstract class FirebaseCollections {
-  static const USER = 'user';
+  static const USER = 'users';
 }

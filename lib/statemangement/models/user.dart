@@ -1,26 +1,37 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_chat_app/utils/utils.dart';
 import 'package:get/get.dart';
 import 'package:firebase_chat_app/statemangement/statemangement.dart';
+import 'package:graphx/graphx.dart';
 
 class UserModel extends BaseModel {
   Timestamp dateCreated;
   String id;
   String username;
   String password;
+  String email;
+  List<UserModel> friends;
 
   UserModel({
     this.dateCreated,
     this.id,
     this.username,
     this.password,
+    this.friends,
+    this.email,
   });
 
 //fromDocumentSnapshot
   UserModel.fromDocumentSnapshot({DocumentSnapshot documentSnapshot}) {
+    trace(documentSnapshot.data());
     id = documentSnapshot.id;
     dateCreated = documentSnapshot.data()["dateCreated"];
     username = documentSnapshot.data()["username"];
     password = documentSnapshot.data()["password"];
+    email = documentSnapshot.data()["email"];
+    friends = documentSnapshot.data()["friends"];
   }
 
 //fromJson
@@ -42,7 +53,8 @@ class UserModel extends BaseModel {
 }
 
 class UserCrud {
-  final FirebaseService<UserModel> firebaseService = Get.find();
+  final FirebaseService<UserModel> firebaseService =
+      Get.put(FirebaseService<UserModel>());
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   static const String Collection = FirebaseCollections.USER;
@@ -56,29 +68,31 @@ class UserCrud {
     }
   }
 
-  void createUser({UserModel user}) {
+  Future<void> createUser({UserModel user}) async {
     final Map<String, dynamic> _data = {
       "dateCreated": Timestamp.now(),
-      "id": user.id,
       "username": user.username,
-      "password": user.password,
+      "email": user.email,
     };
-    firebaseService.crud(
-      CrudState.add,
-      data: _data,
-      collection: Collection,
-      model: UserModel(),
-    );
+    try {
+      await _firestore
+          .collection(FirebaseCollections.USER)
+          .doc(user.id)
+          .set(_data);
+    } on FirebaseException catch (e) {
+      showErrorSnackBar(body: firebaseService.firebaseErrors(e.code));
+    }
   }
 
   void updateuser({UserModel user}) {
     final Map<String, dynamic> _data = {
       "username": user.username,
-      "password": user.password,
+      "email": user.email,
     };
     firebaseService.crud(
       CrudState.update,
       data: _data,
+      wantLoading: false,
       collection: Collection,
       model: UserModel(),
     );
@@ -87,6 +101,7 @@ class UserCrud {
   void deleteUser({String id}) {
     firebaseService.crud(
       CrudState.delete,
+      wantLoading: false,
       collection: Collection,
       model: UserModel(),
     );

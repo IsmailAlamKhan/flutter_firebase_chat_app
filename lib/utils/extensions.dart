@@ -1,3 +1,5 @@
+import 'package:firebase_chat_app/ui/ui.dart';
+
 import 'utils.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -76,6 +78,23 @@ extension ExtendedString on String {
 
   Future get offNamed => Get.offNamed(this);
   bool get active => this == Get.currentRoute;
+  AuthState get convertToAuthState {
+    switch (this) {
+      case 'Login':
+        return AuthState.Login;
+        break;
+      case 'ForgotPass':
+        return AuthState.ForgotPass;
+        break;
+      case 'Registration':
+        return AuthState.Registration;
+        break;
+
+      default:
+        return null;
+        break;
+    }
+  }
 }
 
 extension ExtendedType on Type {
@@ -125,6 +144,15 @@ extension ExtendedWidget on Widget {
       );
 }
 
-extension on FocusNode {
-  void requestFocus() => FocusScope.of(context).requestFocus(this);
+extension SubmitStateExtened on SubmitState {
+  bool get loading => this == SubmitState.Loading;
+  bool get error => this == SubmitState.Error;
+  bool get idle => this == SubmitState.Idle;
+  bool get success => this == SubmitState.Success;
+}
+
+extension AuthStateExtened on AuthState {
+  bool get forgotPass => this == AuthState.ForgotPass;
+  bool get login => this == AuthState.Login;
+  bool get register => this == AuthState.Registration;
 }

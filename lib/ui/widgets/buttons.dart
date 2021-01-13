@@ -1,5 +1,7 @@
-import 'package:get/get.dart';
+import 'package:firebase_chat_app/ui/ui.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:firebase_chat_app/utils/utils.dart';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
@@ -35,17 +37,129 @@ class CustomButton extends StatelessWidget {
   }
 
   Widget _build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onTap,
-      style: ElevatedButton.styleFrom(
-        primary: context.theme.primaryColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
+    return AnimatedContainer(
+      width: 200,
+      height: 45,
+      duration: 500.milliseconds,
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          primary: context.theme.primaryColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          minimumSize: Size(200, 45),
+          elevation: 10,
         ),
-        minimumSize: Size(200, 45),
-        elevation: 10,
+        child: AnimatedSwitcher(
+          duration: 500.milliseconds,
+          child: DefaultText(text),
+        ),
       ),
-      child: Text(text),
+    );
+  }
+}
+
+class RoundedLoadingButton extends StatelessWidget {
+  const RoundedLoadingButton({
+    Key key,
+    @required this.width,
+    @required this.height,
+    @required this.onTap,
+    @required this.title,
+    @required this.submitState,
+    @required this.animDuration,
+  }) : super(key: key);
+
+  final double width;
+  final double height;
+  final Function onTap;
+  final String title;
+  final SubmitState submitState;
+  final Duration animDuration;
+  Widget _buildLoadingState() {
+    return AnimatedCrossFade(
+      crossFadeState: submitState.loading
+          ? CrossFadeState.showFirst
+          : CrossFadeState.showSecond,
+      duration: animDuration,
+      firstCurve: Curves.easeIn,
+      secondCurve: Curves.easeIn,
+      firstChild: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: CircularProgressIndicator(
+          value: null,
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        ),
+      ),
+      secondChild: Icon(
+        submitState.success ? Icons.check : Icons.close,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  Widget _buildSubmitText() {
+    return DefaultText(
+      title,
+      key: ValueKey<String>(title),
+      style: TextStyle(
+        color: Colors.white,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 500),
+      curve: Curves.bounceInOut,
+      height: height,
+      width: width,
+      decoration: BoxDecoration(
+        color: submitState.success
+            ? Colors.green
+            : submitState.error
+                ? Theme.of(context).errorColor
+                : Theme.of(context).primaryColor,
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(30),
+          onTap: submitState.idle ? onTap : null,
+          child: AnimatedSwitcher(
+            transitionBuilder: (child, animation) {
+              final inAnim = Tween<Offset>(
+                begin: Offset(0.0, -1.0),
+                end: Offset(0.0, 0.0),
+              ).animate(animation);
+              final outAnim = Tween<Offset>(
+                begin: Offset(0.0, 1.0),
+                end: Offset(0.0, 0.0),
+              ).animate(animation);
+              if (child.key == ValueKey<String>(title)) {
+                return ClipRRect(
+                  child: SlideTransition(
+                    child: Center(child: child),
+                    position: inAnim,
+                  ),
+                );
+              } else {
+                return ClipRRect(
+                  child: SlideTransition(
+                    child: Center(child: child),
+                    position: outAnim,
+                  ),
+                );
+              }
+            },
+            duration: animDuration,
+            child: submitState.idle ? _buildSubmitText() : _buildLoadingState(),
+          ),
+        ),
+      ),
     );
   }
 }

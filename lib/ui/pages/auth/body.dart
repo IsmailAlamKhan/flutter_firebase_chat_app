@@ -16,32 +16,28 @@ class Auth extends GetView<LoginController> {
   final AuthState authState;
 
   final FocusNode passFocusNode = FocusNode();
+  final FocusNode conPassFocusNode = FocusNode();
   final FocusNode usernameFocusNode = FocusNode();
   final FocusNode emailFocusNode = FocusNode();
 
-  Widget get _buildSubmitButton {
-    Widget _widget;
-    switch (authState) {
-      case AuthState.Login:
-        _widget = CustomButton.login(
-          onTap: () {},
-        );
-        break;
-      case AuthState.Registration:
-        _widget = CustomButton.regiser(
-          onTap: () {},
-        );
-        break;
-      case AuthState.ForgotPass:
-        _widget = CustomButton.forgotPass(
-          onTap: () {},
-        );
-        break;
-      default:
-        _widget = Text('Error');
-        break;
+  void _submit() {
+    if (!_formKey.currentState.validate()) {
+      showErrorSnackBar(body: 'Please enter the mandatory fields');
+      return;
+    } else {
+      controller.submit();
     }
-    return _widget;
+  }
+
+  Widget _buildSubmitButton(AuthState state) {
+    return Obx(() => RoundedLoadingButton(
+          onTap: _submit,
+          width: controller.submitButtonWidth,
+          height: 40,
+          title: controller.submitButtonTitle,
+          animDuration: 500.milliseconds,
+          submitState: controller.submitState,
+        ));
   }
 
   @override
@@ -51,6 +47,7 @@ class Auth extends GetView<LoginController> {
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
+            padding: EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -65,140 +62,145 @@ class Auth extends GetView<LoginController> {
                   tag: 'hero',
                   child: Image.asset(
                     '$ImagePath/logo.png',
-                    width: 200,
-                    height: 200,
+                    width: 100,
+                    height: 100,
                     fit: BoxFit.cover,
                   ),
                 ),
                 10.0.sizedHeight,
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    children: [
-                      DefaultTextField(
-                        focusNode: usernameFocusNode,
-                        textInputAction: TextInputAction.next,
-                        onFieldSubmitted: (_) => passFocusNode.requestFocus(),
-                        tec: null,
-                        label: 'Username',
-                        mandatory: true,
-                      ),
-                      20.0.sizedHeight,
-                      Obx(
-                        () => DefaultTextField.password(
-                          focusNode: passFocusNode,
-                          tec: null,
-                          hidePass: () => controller.obscure(true),
-                          showPass: () => controller.obscure(false),
-                          obscure: controller.obscure.value,
+                Column(
+                  children: [
+                    SizeTransition(
+                      sizeFactor: controller.usernameSizeAnimation,
+                      child: SlideTransition(
+                        position: controller.usernameSlideAnimation,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 20.0),
+                          child: DefaultTextField(
+                            decoration:
+                                InputDecoration(prefixIcon: Icon(Icons.person)),
+                            focusNode: usernameFocusNode,
+                            textInputAction: TextInputAction.next,
+                            onFieldSubmitted: (_) =>
+                                emailFocusNode.requestFocus(),
+                            tec: controller.usernameTec,
+                            label: 'Username',
+                            mandatory: true,
+                          ),
                         ),
                       ),
-                    ],
+                    ),
+                    DefaultTextField(
+                      validator: (value) {
+                        if (!value.isEmail) {
+                          return "Please input a valid email";
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.email),
+                      ),
+                      focusNode: emailFocusNode,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) => passFocusNode.requestFocus(),
+                      tec: controller.emailTec,
+                      label: 'Email',
+                      mandatory: true,
+                    ),
+                    SizeTransition(
+                      sizeFactor: controller.passSizeAnimation,
+                      child: SlideTransition(
+                        position: controller.passSlideAnimation,
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.only(top: 20.0, bottom: 20.0),
+                          child: Obx(
+                            () => DefaultTextField.password(
+                              false,
+                              focusNode: passFocusNode,
+                              textInputAction: TextInputAction.next,
+                              tec: controller.passTec,
+                              onFieldSubmitted: (_) =>
+                                  conPassFocusNode.requestFocus(),
+                              hidePass: () => controller.obscure(true),
+                              showPass: () => controller.obscure(false),
+                              obscure: controller.obscure.value,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizeTransition(
+                      sizeFactor: controller.conPassSizeAnimation,
+                      child: SlideTransition(
+                        position: controller.conPassSlideAnimation,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 20.0),
+                          child: DefaultTextField.password(
+                            true,
+                            tec: controller.conPassTec,
+                            focusNode: conPassFocusNode,
+                            validator: (value) {
+                              if (value != controller.passTec.text) {
+                                return 'Password mismatch';
+                              } else {
+                                return null;
+                              }
+                            },
+                            hidePass: () => controller.conObscure(true),
+                            showPass: () => controller.conObscure(false),
+                            obscure: controller.conObscure.value,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                20.0.sizedHeight,
+                SizeTransition(
+                  sizeFactor: controller.forgotPassButtonSizeAnimation,
+                  child: SlideTransition(
+                    position: controller.forgotPassButtonSlideAnimation,
+                    child: Center(
+                      child: TextButton(
+                        onPressed: () =>
+                            controller.authState = AuthState.ForgotPass,
+                        child: Text(
+                          'Forgot Pass?',
+                          style: context.textTheme.subtitle1,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                40.0.sizedHeight,
-                _buildSubmitButton
+                20.0.sizedHeight,
+                Obx(() => _buildSubmitButton(controller.authState)),
+                20.0.sizedHeight,
+                Obx(
+                  () => TextButton(
+                    child: Text(
+                      controller.authStateChangeButtonTitle,
+                      style: context.textTheme.subtitle1,
+                    ),
+                    onPressed: () {
+                      switch (controller.authState) {
+                        case AuthState.ForgotPass:
+                        case AuthState.Registration:
+                          controller.authState = AuthState.Login;
+                          break;
+                        case AuthState.Login:
+                          controller.authState = AuthState.Registration;
+                          break;
+                        default:
+                      }
+                    },
+                  ),
+                ),
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-class DefaultTextField extends StatelessWidget {
-  const DefaultTextField({
-    Key key,
-    @required this.tec,
-    this.decoration,
-    this.obscure,
-    this.focusNode,
-    this.onFieldSubmitted,
-    this.textInputAction,
-    this.validator,
-    this.mandatory = false,
-    @required this.label,
-  }) : super(key: key);
-  final TextEditingController tec;
-  final InputDecoration decoration;
-  final bool obscure;
-  final FocusNode focusNode;
-  final ValueChanged<String> onFieldSubmitted;
-  final TextInputAction textInputAction;
-  final FormFieldValidator<String> validator;
-  final bool mandatory;
-  final String label;
-  DefaultTextField.password({
-    @required this.tec,
-    @required this.obscure,
-    @required VoidCallback showPass,
-    @required VoidCallback hidePass,
-    this.focusNode,
-    this.onFieldSubmitted,
-    this.textInputAction,
-    this.validator,
-  })  : mandatory = true,
-        label = 'Password',
-        decoration = InputDecoration(
-          prefixIcon: Icon(
-            Icons.lock,
-          ),
-          suffixIcon: AnimatedCrossFade(
-            firstChild: IconButton(
-              icon: Icon(Icons.visibility),
-              onPressed: showPass,
-            ),
-            secondChild: IconButton(
-              icon: Icon(Icons.visibility_off),
-              onPressed: hidePass,
-            ),
-            crossFadeState:
-                obscure ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-            duration: 200.milliseconds,
-          ),
-        );
-  String get _labelText => mandatory
-      ? label.substring(0, 1).toUpperCase() + label.substring(1) + '*'
-      : label.substring(0, 1).toUpperCase() + label.substring(1);
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      validator: (value) {
-        if (mandatory) {
-          if (value == '') return '$label is required';
-
-          return validator(value);
-        } else {
-          return validator(value);
-        }
-      },
-      focusNode: focusNode,
-      controller: tec,
-      textInputAction: textInputAction ?? TextInputAction.done,
-      obscureText: obscure ?? false,
-      onFieldSubmitted: onFieldSubmitted,
-      obscuringCharacter: '*',
-      decoration: decoration == null
-          ? InputDecoration(
-              filled: true,
-              hintText: mandatory ? 'Required' : null,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(50),
-                borderSide: BorderSide.none,
-              ),
-              labelText: _labelText,
-            )
-          : decoration.copyWith(
-              hintText: mandatory ? 'Required' : null,
-              filled: true,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(50),
-                borderSide: BorderSide.none,
-              ),
-              labelText: _labelText,
-            ),
     );
   }
 }
