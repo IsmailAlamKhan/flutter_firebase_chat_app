@@ -105,3 +105,29 @@ class TextToLoading extends StatelessWidget {
     );
   }
 }
+
+class HeroText extends StatelessWidget {
+  const HeroText({
+    Key key,
+    @required this.text,
+    @required this.tag,
+    this.style,
+  }) : super(key: key);
+  final String text;
+  final TextStyle style;
+  final String tag;
+  @override
+  Widget build(BuildContext context) {
+    return Hero(
+      tag: tag,
+      child: Material(
+        color: Colors.transparent,
+        clipBehavior: Clip.antiAlias,
+        child: Text(
+          text,
+          style: style,
+        ),
+      ),
+    );
+  }
+}

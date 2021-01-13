@@ -29,8 +29,9 @@ class OnBoardingPage extends GetView<OnboardingController> {
                   ),
                 ),
                 10.0.sizedWidth,
-                Text(
-                  'Ismail Chat App',
+                HeroText(
+                  text: 'Ismail Chat App',
+                  tag: 'Ismail Chat App',
                   style: context.textTheme.headline4,
                 ),
               ],
@@ -39,44 +40,20 @@ class OnBoardingPage extends GetView<OnboardingController> {
             CustomButton.login(
               onTap: () => Auth(
                 authState: AuthState.Login,
-              ).to(AuthBinding()),
+              ).to(
+                AuthBinding(),
+              ),
             ),
             20.0.sizedHeight,
             CustomButton.regiser(
               onTap: () => Auth(
                 authState: AuthState.Registration,
-              ).to(AuthBinding()),
+              ).to(
+                AuthBinding(),
+              ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class CustomButton extends StatelessWidget {
-  const CustomButton({
-    Key key,
-    this.onTap,
-    this.text,
-  }) : super(key: key);
-  CustomButton.login({this.onTap}) : text = 'Login';
-  CustomButton.regiser({this.onTap}) : text = 'Register';
-
-  final VoidCallback onTap;
-  final String text;
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      elevation: 10,
-      clipBehavior: Clip.antiAlias,
-      borderRadius: BorderRadius.circular(30),
-      child: MaterialButton(
-        onPressed: onTap,
-        minWidth: 200,
-        height: 45,
-        child: Text(text),
-        elevation: 10,
       ),
     );
   }

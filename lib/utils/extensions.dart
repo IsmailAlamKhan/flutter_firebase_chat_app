@@ -1,9 +1,10 @@
 import 'utils.dart';
 import 'dart:math';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:firebase_chat_app/statemangement/statemangement.dart';
 
-const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+const _chars = 'AabCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
 Random _rnd = Random();
 
 extension ExtendedString on String {
@@ -78,7 +79,16 @@ extension ExtendedString on String {
 }
 
 extension ExtendedType on Type {
-  String convertTypeToModelName() => this.toString();
+  String get convertToString {
+    switch (this) {
+      case UserModel:
+        return 'User';
+        break;
+      default:
+        return this.toString();
+        break;
+    }
+  }
 }
 
 extension ExtendedInt on int {
@@ -113,4 +123,8 @@ extension ExtendedWidget on Widget {
   Future openDIALOG() => openDialog(
         child: this,
       );
+}
+
+extension on FocusNode {
+  void requestFocus() => FocusScope.of(context).requestFocus(this);
 }
