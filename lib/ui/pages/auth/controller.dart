@@ -16,11 +16,11 @@ enum SubmitState {
 class AuthBinding implements Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<LoginController>(() => LoginController());
+    Get.lazyPut<AuthController>(() => AuthController());
   }
 }
 
-class LoginController extends GetxController with SingleGetTickerProviderMixin {
+class AuthController extends GetxController with SingleGetTickerProviderMixin {
   final AuthService _authController = Get.find();
 
   final _submitButtonWidth = 150.0.obs;
@@ -66,7 +66,7 @@ class LoginController extends GetxController with SingleGetTickerProviderMixin {
       _submitState(SubmitState.Success);
       await 1000.milliseconds.delay();
       _submitState(SubmitState.Idle);
-      Home().offAll();
+      ProfilePic().offAll();
     } catch (e) {
       _submitState(SubmitState.Error);
       showErrorSnackBar(body: e.toString());
@@ -113,7 +113,7 @@ class LoginController extends GetxController with SingleGetTickerProviderMixin {
 
   AnimationController get initAnimController {
     return AnimationController(
-      duration: 300.milliseconds,
+      duration: 500.milliseconds,
       vsync: this,
     );
   }
@@ -127,7 +127,7 @@ class LoginController extends GetxController with SingleGetTickerProviderMixin {
 
   Tween<Offset> get initOffsetAnims {
     return Tween<Offset>(
-      begin: const Offset(-1, 0),
+      begin: const Offset(1, 0),
       end: const Offset(0, 0),
     );
   }
@@ -226,7 +226,7 @@ class LoginController extends GetxController with SingleGetTickerProviderMixin {
 
   Future<void> changeToReg() async {
     _submitButtonTitle('Register');
-    _authStateChangeButtonTitle('Back');
+    _authStateChangeButtonTitle('Login');
 
     usernameSizeController.forward();
     await 300.milliseconds.delay();
@@ -249,7 +249,7 @@ class LoginController extends GetxController with SingleGetTickerProviderMixin {
 
   Future<void> changeToForgotPass() async {
     _submitButtonTitle('Forgot Password');
-    _authStateChangeButtonTitle('Back');
+    _authStateChangeButtonTitle('Login');
 
     forgotPassButtonController.reverse();
     passSlideController.reverse();

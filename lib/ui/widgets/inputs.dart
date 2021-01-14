@@ -34,8 +34,8 @@ class DefaultTextField extends StatelessWidget {
     this.onFieldSubmitted,
     this.textInputAction,
     this.validator,
-  })  : mandatory = true,
-        label = isConPaas ? 'Confirm Password' : 'Password',
+    @required this.mandatory,
+  })  : label = isConPaas ? 'Confirm Password' : 'Password',
         decoration = InputDecoration(
           prefixIcon: Icon(
             Icons.lock,
@@ -60,41 +60,36 @@ class DefaultTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      validator: (value) {
-        if (mandatory) {
-          if (value == '') return '$label is required';
+    return IconTheme(
+      data: IconThemeData(
+        size: 40,
+      ),
+      child: TextFormField(
+        validator: (value) {
+          if (mandatory) {
+            if (value == '') return '$label is required';
 
-          return validator?.call(value);
-        } else {
-          return validator?.call(value);
-        }
-      },
-      focusNode: focusNode,
-      controller: tec,
-      textInputAction: textInputAction ?? TextInputAction.done,
-      obscureText: obscure ?? false,
-      onFieldSubmitted: onFieldSubmitted,
-      obscuringCharacter: '*',
-      decoration: decoration == null
-          ? InputDecoration(
-              filled: true,
-              helperText: mandatory ? 'Required' : null,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(50),
-                borderSide: BorderSide.none,
+            return validator?.call(value);
+          } else {
+            return validator?.call(value);
+          }
+        },
+        focusNode: focusNode,
+        controller: tec,
+        textInputAction: textInputAction ?? TextInputAction.done,
+        obscureText: obscure ?? false,
+        onFieldSubmitted: onFieldSubmitted,
+        obscuringCharacter: '*',
+        decoration: decoration == null
+            ? InputDecoration(
+                border: UnderlineInputBorder(),
+                labelText: _labelText,
+              )
+            : decoration.copyWith(
+                border: UnderlineInputBorder(),
+                labelText: _labelText,
               ),
-              labelText: _labelText,
-            )
-          : decoration.copyWith(
-              helperText: mandatory ? 'Required' : null,
-              filled: true,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(50),
-                borderSide: BorderSide.none,
-              ),
-              labelText: _labelText,
-            ),
+      ),
     );
   }
 }

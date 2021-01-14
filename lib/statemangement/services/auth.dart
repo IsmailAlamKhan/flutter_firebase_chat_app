@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_chat_app/ui/ui.dart';
 import 'package:flutter/material.dart';

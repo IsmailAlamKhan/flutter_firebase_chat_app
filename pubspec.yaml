@@ -30,6 +30,7 @@ dependencies:
   firebase_storage: ^7.0.0
   flutter_icons: ^1.1.0
   get: ^3.24.0
+  get_storage: ^1.4.0
   google_fonts: ^1.1.1
   graphx: 0.9.6+2
   image_picker: ^0.6.7+21

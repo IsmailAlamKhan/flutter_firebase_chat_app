@@ -123,7 +123,7 @@ class RoundedLoadingButton extends StatelessWidget {
         child: _build(context),
       );
     } else {
-      _build(context);
+      return _build(context);
     }
   }
 
