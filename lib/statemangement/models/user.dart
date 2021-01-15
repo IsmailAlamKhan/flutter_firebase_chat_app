@@ -84,17 +84,17 @@ class UserCrud {
     }
   }
 
-  Future<void> updateuser({UserModel user}) async {
+  Future<String> updateuser({UserModel user}) async {
     final Map<String, dynamic> _data = {
       "username": user.displayName,
       "email": user.email,
-      // "emailVerified": user.emailVerified,
+      "emailVerified": user.emailVerified,
+      "photoURL": user.photoURL,
     };
-    await firebaseService.crud(
+    return await firebaseService.crud(
       CrudState.update,
       data: _data,
       wantLoading: false,
-      wantNotification: false,
       collection: Collection,
       model: user,
     );

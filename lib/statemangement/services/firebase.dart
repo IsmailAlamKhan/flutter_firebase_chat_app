@@ -96,39 +96,42 @@ class FirebaseService<T extends BaseModel> extends GetxService {
 
   static FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> crud(
+  Future<String> crud(
     CrudState crudState, {
     Map<String, dynamic> data,
     @required String collection,
     @required T model,
     bool wantLoading = true,
-    bool wantNotification = true,
   }) async {
     if (crudState != CrudState.delete && data == null)
-      throw Exception('You need to provide data if you are updating or adding');
+      return Future.error(
+          'You need to provide data if you are updating or adding');
     if (wantLoading) {
       trace(wantLoading);
       await showLoadingWithProggress(
         wantProggress: false,
       );
-      await _crud(
+      return await _crud(
         crudState,
         collection,
         data,
         model,
-        wantNotification,
       );
     } else {
-      await _crud(crudState, collection, data, model, wantNotification);
+      return await _crud(
+        crudState,
+        collection,
+        data,
+        model,
+      );
     }
   }
 
-  Future _crud(
+  Future<String> _crud(
     CrudState crudState,
     String collection,
     Map<String, dynamic> data,
     T model,
-    bool wantNotification,
   ) async {
     try {
       String _crudMessege = '';
@@ -147,12 +150,13 @@ class FirebaseService<T extends BaseModel> extends GetxService {
           break;
         default:
       }
-      showSuccessSnackBar(
-        body:
-            "${model.runtimeType?.convertToString} Successfully $_crudMessege",
-      );
+      return "${model.runtimeType?.convertToString} Successfully $_crudMessege";
+      // showSuccessSnackBar(
+      //   body:
+      //       "${model.runtimeType?.convertToString} Successfully $_crudMessege",
+      // );
     } on FirebaseException catch (e) {
-      showErrorSnackBar(body: firebaseErrors(e.code));
+      return firebaseErrors(e.code);
     }
   }
 

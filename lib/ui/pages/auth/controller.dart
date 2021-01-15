@@ -30,8 +30,12 @@ class AuthController extends GetxController with SingleGetTickerProviderMixin {
   final _submitButtonTitle = 'Login'.obs;
   String get submitButtonTitle => _submitButtonTitle.value;
 
-  final _authStateChangeButtonTitle = 'Registration'.obs;
-  String get authStateChangeButtonTitle => _authStateChangeButtonTitle.value;
+  String authStateChangeButtonTitle(AuthState authState) {
+    if (authState.forgotPass || authState.register) {
+      return 'Login';
+    }
+    return 'Register';
+  }
 
   // final _authState = AuthState.Login.obs;
   // AuthState get authState => _authState.value;
@@ -66,7 +70,6 @@ class AuthController extends GetxController with SingleGetTickerProviderMixin {
       _submitState(SubmitState.Success);
       await 1000.milliseconds.delay();
       _submitState(SubmitState.Idle);
-      UserProfile().offAll();
     } catch (e) {
       _submitState(SubmitState.Error);
       showErrorSnackBar(body: e.toString());
@@ -90,21 +93,6 @@ class AuthController extends GetxController with SingleGetTickerProviderMixin {
     super.onInit();
   }
 
-  Future<void> changeToLogin() async {
-    _submitButtonTitle('Login');
-    _authStateChangeButtonTitle('Registration');
-  }
-
-  Future<void> changeToReg() async {
-    _submitButtonTitle('Register');
-    _authStateChangeButtonTitle('Login');
-  }
-
-  Future<void> changeToForgotPass() async {
-    _submitButtonTitle('Forgot Password');
-    _authStateChangeButtonTitle('Login');
-  }
-
   void submitStateOnChange(SubmitState val) {
     if (val.loading) {
       _submitButtonWidth(
@@ -112,22 +100,6 @@ class AuthController extends GetxController with SingleGetTickerProviderMixin {
       );
     } else {
       _submitButtonWidth(150);
-    }
-  }
-
-  void authStateOnChange(AuthState val) {
-    trace(val);
-    switch (val) {
-      case AuthState.Login:
-        changeToLogin();
-        break;
-      case AuthState.Registration:
-        changeToReg();
-        break;
-      case AuthState.ForgotPass:
-        changeToForgotPass();
-        break;
-      default:
     }
   }
 }

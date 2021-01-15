@@ -130,7 +130,6 @@ Future<T> openDialog<T>({Widget child, bool barrierDismissible = false}) {
   return Get.dialog(
     child,
     barrierDismissible: barrierDismissible,
-    barrierColor: primaryColorOverlay.withOpacity(.5),
     transitionCurve: Curves.bounceInOut,
     transitionDuration: Duration(milliseconds: 500),
   );
@@ -205,6 +204,7 @@ void showErrorSnackBar({
     Get.rawSnackbar(
       snackStyle: SnackStyle.GROUNDED,
       backgroundColor: ErrorColor,
+      snackPosition: SnackPosition.TOP,
       mainButton: button,
       borderRadius: 5,
       messageText: DefaultText(
@@ -237,6 +237,7 @@ void showInfoSnackBar({
       snackStyle: SnackStyle.GROUNDED,
       backgroundColor: InfoColor,
       mainButton: button,
+      snackPosition: SnackPosition.TOP,
       borderRadius: 5,
       messageText: DefaultText(
         body,
@@ -266,6 +267,7 @@ void showSuccessSnackBar({
     Get.rawSnackbar(
       snackStyle: SnackStyle.GROUNDED,
       backgroundColor: SuccessColor,
+      snackPosition: SnackPosition.TOP,
       mainButton: button,
       borderRadius: 5,
       messageText: DefaultText(

@@ -11,11 +11,9 @@ class Root extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetX<AuthService>(
       init: AuthService(),
-      initState: (_) {
-        Get.put(UserProfileController());
-      },
       builder: (AuthService controller) {
         if (controller.user.value?.uid != null) {
+          Get.put(UserProfileController());
           return UserProfile();
         } else {
           return Login();

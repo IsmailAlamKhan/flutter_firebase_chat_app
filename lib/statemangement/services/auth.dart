@@ -1,12 +1,13 @@
-import 'dart:developer';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_chat_app/ui/ui.dart';
 import 'package:firebase_chat_app/utils/utils.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphx/graphx.dart';
-
+import 'package:path/path.dart' as p;
 import '../statemangement.dart';
 
 class AuthService extends GetxService {
@@ -44,15 +45,16 @@ class AuthService extends GetxService {
     trace(val.id);
     if (val == null) return;
     trace(val.id);
-    debugger();
+    // debugger();
     if (val.displayName == currentUser.displayName &&
-        val.email == currentUser.email) {
+        val.email == currentUser.email &&
+        val.photoURL == currentUser.photoURL) {
       showInfoSnackBar(body: 'Nothing to update');
       return;
     }
-    // await showLoadingWithProggress(
-    //   wantProggress: false,
-    // );
+    await showLoadingWithProggress(
+      wantProggress: false,
+    );
     try {
       if (val.email != null && val.email != currentUser.email) {
         await currentUser.updateEmail(
@@ -64,15 +66,32 @@ class AuthService extends GetxService {
           displayName: val.displayName,
         );
       } else if (val.photoURL != null && val.photoURL != currentUser.photoURL) {
-        await currentUser.updateProfile(photoURL: val.photoURL);
+        final File _photo = File(val.photoURL);
+        String _fileName =
+            "${p.basename(currentUser.uid)}${p.extension(val.photoURL)}";
+        final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
+        final Reference _ref =
+            _firebaseStorage.ref().child('/profileimages/$_fileName');
+        await _ref.putFile(_photo);
+        final String _photoUrl = await _ref.getDownloadURL();
+        await currentUser.updateProfile(photoURL: _photoUrl);
       }
-      val.id = currentUser.uid;
-      await UserCrud().updateuser(
-        user: val,
+      final _user = UserModel(
+        displayName: currentUser.displayName,
+        email: currentUser.email,
+        emailVerified: currentUser.emailVerified,
+        photoURL: currentUser.photoURL,
+        id: currentUser.uid,
       );
-      // Get.back();
+      final String msg = await UserCrud().updateuser(user: _user);
+      Get.back();
+      showSuccessSnackBar(body: msg);
+      currentUser.reload();
+      Get.find<UserProfileController>().image = null;
+      Get.find<UserProfileController>().imagePicked = false;
+      Get.find<UserProfileController>().counter += 1;
     } catch (e) {
-      // Get.back();
+      Get.back();
       showErrorSnackBar(body: e.toString());
     }
   }
@@ -81,7 +100,7 @@ class AuthService extends GetxService {
   @override
   void onReady() {
     userWorker = ever(userController.user, (UserModel val) {
-      if (currentUser.displayName != val.displayName) {
+      if (currentUser?.displayName != val.displayName) {
         currentUser.updateProfile(
           displayName: val.displayName,
         );

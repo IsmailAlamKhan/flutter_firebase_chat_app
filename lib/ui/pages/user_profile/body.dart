@@ -95,38 +95,45 @@ class UserProfile extends GetView<UserProfileController> {
   }
 }
 
-class _BuildPhoto extends StatelessWidget {
+class _BuildPhoto extends GetView<UserProfileController> {
   const _BuildPhoto({
     Key key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      child: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 10,
-              color: Colors.grey.shade300,
-              spreadRadius: -50,
-            )
-          ],
-          gradient: LinearGradient(
-            colors: [
-              context.theme.primaryColor.withOpacity(.5),
-              Colors.white,
+    var profilePic;
+    return GestureDetector(
+      onTap: controller.pickPhoto,
+      child: Align(
+        child: Container(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 10,
+                color: Colors.grey.shade300,
+                spreadRadius: -50,
+              )
             ],
-            end: Alignment(2.0, 0.0),
+            gradient: LinearGradient(
+              colors: [
+                context.theme.primaryColor.withOpacity(.5),
+                Colors.white,
+              ],
+              end: Alignment(2.0, 0.0),
+            ),
+            shape: BoxShape.circle,
           ),
-          shape: BoxShape.circle,
-        ),
-        width: 200,
-        height: 200,
-        padding: EdgeInsets.all(15),
-        child: CircleAvatar(
-          backgroundColor: context.theme.primaryColor,
-          backgroundImage: AssetImage('$ImagePath/defaultDark.png'),
+          width: 200,
+          height: 200,
+          padding: EdgeInsets.all(15),
+          child: Obx(
+            () => CircleAvatar(
+              key: ValueKey<int>(controller.counter),
+              backgroundColor: context.theme.primaryColor,
+              backgroundImage: controller.profilePic(),
+            ),
+          ),
         ),
       ),
     );

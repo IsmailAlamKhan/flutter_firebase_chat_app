@@ -133,7 +133,7 @@ class _Build extends StatelessWidget {
             onTap: submit,
             width: controller.submitButtonWidth,
             height: 40,
-            title: controller.submitButtonTitle,
+            title: 'Login',
             animDuration: 500.milliseconds,
             submitState: controller.submitState,
           ),
@@ -147,7 +147,7 @@ class _Build extends StatelessWidget {
             onTap: submit,
             width: controller.submitButtonWidth,
             height: 40,
-            title: controller.submitButtonTitle,
+            title: 'Send email',
             animDuration: 500.milliseconds,
             submitState: controller.submitState,
           ),
@@ -161,7 +161,7 @@ class _Build extends StatelessWidget {
             onTap: submit,
             width: controller.submitButtonWidth,
             height: 40,
-            title: controller.submitButtonTitle,
+            title: 'Register',
             animDuration: 500.milliseconds,
             submitState: controller.submitState,
           ),
@@ -301,7 +301,7 @@ class _Build extends StatelessWidget {
           Align(
             child: TextButton(
               child: Text(
-                controller.authStateChangeButtonTitle,
+                controller.authStateChangeButtonTitle(authState),
                 style: context.textTheme.subtitle1,
               ),
               onPressed: () {
