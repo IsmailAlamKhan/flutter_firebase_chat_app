@@ -33,9 +33,9 @@ class AuthController extends GetxController with SingleGetTickerProviderMixin {
   final _authStateChangeButtonTitle = 'Registration'.obs;
   String get authStateChangeButtonTitle => _authStateChangeButtonTitle.value;
 
-  final _authState = AuthState.Login.obs;
-  AuthState get authState => _authState.value;
-  set authState(AuthState value) => _authState(value);
+  // final _authState = AuthState.Login.obs;
+  // AuthState get authState => _authState.value;
+  // set authState(AuthState value) => _authState(value);
 
   final _submitState = SubmitState.Idle.obs;
   SubmitState get submitState => _submitState.value;
@@ -49,7 +49,7 @@ class AuthController extends GetxController with SingleGetTickerProviderMixin {
   final TextEditingController passTec = TextEditingController();
   final TextEditingController conPassTec = TextEditingController();
 
-  Future<void> submit() async {
+  Future<void> submit(AuthState authState) async {
     try {
       _submitState(SubmitState.Loading);
       await 300.milliseconds.delay();
@@ -66,7 +66,7 @@ class AuthController extends GetxController with SingleGetTickerProviderMixin {
       _submitState(SubmitState.Success);
       await 1000.milliseconds.delay();
       _submitState(SubmitState.Idle);
-      ProfilePic().offAll();
+      UserProfile().offAll();
     } catch (e) {
       _submitState(SubmitState.Error);
       showErrorSnackBar(body: e.toString());
@@ -78,191 +78,31 @@ class AuthController extends GetxController with SingleGetTickerProviderMixin {
   }
 
   Worker _submitWorker;
-  Worker _authStateWorker;
   @override
   void onClose() {
     _submitWorker?.dispose();
-    _authStateWorker?.dispose();
     super.onClose();
-  }
-
-  AnimationController usernameSizeController;
-  AnimationController usernameSlideController;
-  Animation<double> usernameSizeAnimation;
-  Animation<Offset> usernameSlideAnimation;
-
-  AnimationController passSizeController;
-  AnimationController passSlideController;
-
-  Animation<double> passSizeAnimation;
-  Animation<Offset> passSlideAnimation;
-
-  AnimationController conPassSizeController;
-  AnimationController conPassSlideController;
-  Animation<double> conPassSizeAnimation;
-  Animation<Offset> conPassSlideAnimation;
-
-  AnimationController emailSizeController;
-  AnimationController emailSlideController;
-  Animation<double> emailSizeAnimation;
-  Animation<Offset> emailSlideAnimation;
-
-  AnimationController forgotPassButtonController;
-  Animation<double> forgotPassButtonSizeAnimation;
-  Animation<Offset> forgotPassButtonSlideAnimation;
-
-  AnimationController get initAnimController {
-    return AnimationController(
-      duration: 500.milliseconds,
-      vsync: this,
-    );
-  }
-
-  Tween<double> get initDoubleAnims {
-    return Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    );
-  }
-
-  Tween<Offset> get initOffsetAnims {
-    return Tween<Offset>(
-      begin: const Offset(1, 0),
-      end: const Offset(0, 0),
-    );
-  }
-
-  CurvedAnimation doubleCurveAnimations(AnimationController anim) {
-    return CurvedAnimation(
-      parent: anim,
-      curve: const Interval(0.0, .6875, curve: Curves.easeInOut),
-      reverseCurve: const Interval(0.0, .6875, curve: Curves.easeInOut),
-    );
-  }
-
-  CurvedAnimation offsetCurveAnimations(AnimationController anim) {
-    return CurvedAnimation(
-      parent: anim,
-      curve: Curves.easeInOut,
-      reverseCurve: Curves.easeInOut,
-    );
   }
 
   @override
   void onInit() {
-    usernameSlideController = initAnimController;
-    usernameSizeController = initAnimController;
-    usernameSizeAnimation = initDoubleAnims.animate(
-      doubleCurveAnimations(usernameSizeController),
-    );
-    usernameSlideAnimation = initOffsetAnims.animate(
-      offsetCurveAnimations(usernameSlideController),
-    );
-
-    forgotPassButtonController = initAnimController;
-    forgotPassButtonSizeAnimation = initDoubleAnims.animate(
-      doubleCurveAnimations(forgotPassButtonController),
-    );
-    forgotPassButtonSlideAnimation = initOffsetAnims.animate(
-      offsetCurveAnimations(forgotPassButtonController),
-    );
-    passSlideController = initAnimController;
-    passSizeController = initAnimController;
-    passSizeAnimation = initDoubleAnims.animate(
-      doubleCurveAnimations(passSizeController),
-    );
-    passSlideAnimation = initOffsetAnims.animate(
-      offsetCurveAnimations(passSlideController),
-    );
-    conPassSlideController = initAnimController;
-    conPassSizeController = initAnimController;
-    conPassSizeAnimation = initDoubleAnims.animate(
-      doubleCurveAnimations(conPassSizeController),
-    );
-    conPassSlideAnimation = initOffsetAnims.animate(
-      offsetCurveAnimations(conPassSlideController),
-    );
-
-    emailSlideController = initAnimController;
-    emailSizeController = initAnimController;
-    emailSizeAnimation = initDoubleAnims.animate(
-      doubleCurveAnimations(emailSizeController),
-    );
-    emailSlideAnimation = initOffsetAnims.animate(
-      offsetCurveAnimations(emailSlideController),
-    );
     _submitWorker = ever(_submitState, submitStateOnChange);
-    _authStateWorker = ever(_authState, authStateOnChange);
     super.onInit();
-  }
-
-  @override
-  onReady() {
-    authStateOnChange(_authState.value);
-    super.onReady();
   }
 
   Future<void> changeToLogin() async {
     _submitButtonTitle('Login');
     _authStateChangeButtonTitle('Registration');
-
-    emailSizeController.forward();
-    await 300.milliseconds.delay();
-    emailSlideController.forward();
-
-    passSizeController.forward();
-    await 300.milliseconds.delay();
-    passSlideController.forward();
-
-    forgotPassButtonController.forward();
-    usernameSlideController.reverse();
-    await 300.milliseconds.delay();
-    usernameSizeController.reverse();
-
-    conPassSlideController.reverse();
-    await 300.milliseconds.delay();
-    conPassSizeController.reverse();
   }
 
   Future<void> changeToReg() async {
     _submitButtonTitle('Register');
     _authStateChangeButtonTitle('Login');
-
-    usernameSizeController.forward();
-    await 300.milliseconds.delay();
-    usernameSlideController.forward();
-
-    emailSizeController.forward();
-    await 300.milliseconds.delay();
-    emailSlideController.forward();
-
-    passSizeController.forward();
-    await 300.milliseconds.delay();
-    passSlideController.forward();
-
-    conPassSizeController.forward();
-    await 300.milliseconds.delay();
-    conPassSlideController.forward();
-
-    forgotPassButtonController.forward();
   }
 
   Future<void> changeToForgotPass() async {
     _submitButtonTitle('Forgot Password');
     _authStateChangeButtonTitle('Login');
-
-    forgotPassButtonController.reverse();
-    passSlideController.reverse();
-    await 300.milliseconds.delay();
-    passSizeController.reverse();
-
-    usernameSlideController.reverse();
-    await 300.milliseconds.delay();
-    usernameSizeController.reverse();
-
-    conPassSlideController.reverse();
-    await 300.milliseconds.delay();
-    conPassSizeController.reverse();
   }
 
   void submitStateOnChange(SubmitState val) {

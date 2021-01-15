@@ -194,23 +194,18 @@ Future<void> showLoadingWithProggress({
   String nonProgressText,
   bool wantProggress = true,
   RxInt total,
-  @required Function afterStarted,
 }) async {
   Get.dialog(
-    WillPopScope(
-      onWillPop: () async => false,
-      child: DialogWithLoader(
-        uploadText: uploadText,
-        nonProgressText: nonProgressText,
-        sent: sent,
-        total: total,
-        value: value,
-        wantProggress: wantProggress,
-      ),
+    DialogWithLoader(
+      uploadText: uploadText,
+      nonProgressText: nonProgressText,
+      sent: sent,
+      total: total,
+      value: value,
+      wantProggress: wantProggress,
     ),
     barrierDismissible: false,
     barrierColor: Get.overlayContext.theme.primaryColor.withOpacity(.2),
   );
   await Future.delayed(1.seconds);
-  afterStarted?.call();
 }

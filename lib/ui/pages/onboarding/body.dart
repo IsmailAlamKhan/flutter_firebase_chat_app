@@ -12,7 +12,6 @@ class OnBoardingPage extends GetView<OnboardingController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.theme.accentColor,
       body: Center(
         child: Stack(
           children: [
@@ -72,9 +71,7 @@ class OnBoardingPage extends GetView<OnboardingController> {
                   onTap: () {
                     GetStorage box = GetStorage();
                     box.write('onBoarding', true);
-                    Auth(
-                      authState: AuthState.Registration,
-                    ).to(
+                    Register().offAll(
                       AuthBinding(),
                     );
                   },

@@ -7,18 +7,20 @@ import 'package:graphx/graphx.dart';
 class UserModel extends BaseModel {
   Timestamp dateCreated;
   String id;
-  String username;
-  String password;
+  String displayName;
+  String photoURL;
   String email;
   List<UserModel> friends;
+  bool emailVerified;
 
   UserModel({
     this.dateCreated,
     this.id,
-    this.username,
-    this.password,
+    this.photoURL,
+    this.displayName,
     this.friends,
     this.email,
+    this.emailVerified = false,
   });
 
 //fromDocumentSnapshot
@@ -26,26 +28,24 @@ class UserModel extends BaseModel {
     trace(documentSnapshot.data());
     id = documentSnapshot.id;
     dateCreated = documentSnapshot.data()["dateCreated"];
-    username = documentSnapshot.data()["username"];
-    password = documentSnapshot.data()["password"];
+    displayName = documentSnapshot.data()["username"];
     email = documentSnapshot.data()["email"];
     friends = documentSnapshot.data()["friends"];
+    emailVerified = documentSnapshot.data()["emailVerified"];
+    photoURL = documentSnapshot.data()["photoURL"];
   }
 
-//fromJson
-  UserModel.fromJson(Map<String, dynamic> json) {
-    dateCreated = json['dateCreated'];
-    id = json['id'];
-    username = json['username'];
-    password = json['password'];
-  }
-//toJson
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = Map<String, dynamic>();
     data['dateCreated'] = this.dateCreated;
     data['id'] = this.id;
-    data['username'] = this.username;
-    data['password'] = this.password;
+    data['displayName'] = this.displayName;
+    data['photoURL'] = this.photoURL;
+    data['email'] = this.email;
+    if (this.friends != null) {
+      data['friends'] = this.friends.map((v) => v.toJson()).toList();
+    }
+    data['emailVerified'] = this.emailVerified;
     return data;
   }
 }
@@ -56,20 +56,22 @@ class UserCrud {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   static const String Collection = FirebaseCollections.USER;
-  Future<UserModel> getUser(String uid) async {
-    try {
-      DocumentSnapshot _doc =
-          await _firestore.collection(FirebaseCollections.USER).doc(uid).get();
-      return UserModel.fromDocumentSnapshot(documentSnapshot: _doc);
-    } catch (e) {
-      rethrow;
-    }
+  Stream<UserModel> getUser(String uid) {
+    return _firestore
+        .collection(Collection)
+        .doc(uid)
+        .snapshots()
+        .map((DocumentSnapshot element) {
+      return UserModel.fromDocumentSnapshot(
+        documentSnapshot: element,
+      );
+    });
   }
 
   Future<void> createUser({UserModel user}) async {
     final Map<String, dynamic> _data = {
       "dateCreated": Timestamp.now(),
-      "username": user.username,
+      "username": user.displayName,
       "email": user.email,
     };
     try {
@@ -82,17 +84,19 @@ class UserCrud {
     }
   }
 
-  void updateuser({UserModel user}) {
+  Future<void> updateuser({UserModel user}) async {
     final Map<String, dynamic> _data = {
-      "username": user.username,
+      "username": user.displayName,
       "email": user.email,
+      // "emailVerified": user.emailVerified,
     };
-    firebaseService.crud(
+    await firebaseService.crud(
       CrudState.update,
       data: _data,
       wantLoading: false,
+      wantNotification: false,
       collection: Collection,
-      model: UserModel(),
+      model: user,
     );
   }
 

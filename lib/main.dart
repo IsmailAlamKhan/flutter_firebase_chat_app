@@ -13,7 +13,13 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await GetStorage.init();
-  Get.put(SplashService());
+  traceConfig(
+    argsSeparator: "=>",
+    showClassname: true,
+    showFilename: true,
+    showLinenumber: true,
+    showMethodname: true,
+  );
   Get.put(FirebaseService());
   Get.put(UserController());
   Get.put(AuthService());
@@ -50,10 +56,8 @@ class MyApp extends StatelessWidget {
         ),
         primaryColor: Color(0xFF3CE261),
       ),
-      initialBinding: BindingsBuilder.put(() => OnboardingController()),
-      home: 'onBoarding'.getValue
-          ? Auth(authState: AuthState.Login)
-          : OnBoardingPage(),
+      initialBinding: AuthBinding(),
+      home: ('onBoarding'.getValue ?? false) ? Root() : OnBoardingPage(),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:firebase_chat_app/ui/ui.dart';
 import 'package:firebase_chat_app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
+import 'package:graphx/graphx.dart';
 
 enum CrudState { add, update, delete }
 
@@ -101,21 +102,34 @@ class FirebaseService<T extends BaseModel> extends GetxService {
     @required String collection,
     @required T model,
     bool wantLoading = true,
+    bool wantNotification = true,
   }) async {
     if (crudState != CrudState.delete && data == null)
       throw Exception('You need to provide data if you are updating or adding');
     if (wantLoading) {
+      trace(wantLoading);
       await showLoadingWithProggress(
-        afterStarted: () async {},
         wantProggress: false,
       );
+      await _crud(
+        crudState,
+        collection,
+        data,
+        model,
+        wantNotification,
+      );
     } else {
-      await _crud(crudState, collection, data, model);
+      await _crud(crudState, collection, data, model, wantNotification);
     }
   }
 
-  Future _crud(CrudState crudState, String collection,
-      Map<String, dynamic> data, model) async {
+  Future _crud(
+    CrudState crudState,
+    String collection,
+    Map<String, dynamic> data,
+    T model,
+    bool wantNotification,
+  ) async {
     try {
       String _crudMessege = '';
       switch (crudState) {
@@ -125,7 +139,7 @@ class FirebaseService<T extends BaseModel> extends GetxService {
           break;
         case CrudState.update:
           _crudMessege = 'Updated';
-          await _firestore.collection(collection).doc(model.id).set(data);
+          await _firestore.collection(collection).doc(model.id).update(data);
           break;
         case CrudState.delete:
           _crudMessege = 'Deleted';

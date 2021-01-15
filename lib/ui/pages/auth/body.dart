@@ -9,12 +9,9 @@ import '../../ui.dart';
 enum AuthState { Login, Registration, ForgotPass }
 
 class Auth extends GetView<AuthController> {
-  Auth({Key key, @required this.authState}) : super(key: key) {
-    Get.put<AuthController>(AuthController()).authState = authState;
-  }
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  Auth({Key key, @required this.authState}) : super(key: key);
   final AuthState authState;
-
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final FocusNode passFocusNode = FocusNode();
   final FocusNode conPassFocusNode = FocusNode();
   final FocusNode usernameFocusNode = FocusNode();
@@ -25,7 +22,7 @@ class Auth extends GetView<AuthController> {
       showErrorSnackBar(body: 'Please enter the mandatory fields');
       return;
     } else {
-      controller.submit();
+      controller.submit(authState);
     }
   }
 
@@ -39,17 +36,13 @@ class Auth extends GetView<AuthController> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Obx(
-                      () => AnimatedCrossFade(
-                        crossFadeState: controller.authState.register
-                            ? CrossFadeState.showFirst
-                            : CrossFadeState.showSecond,
-                        duration: 500.milliseconds,
-                        secondChild: SizedBox.shrink(),
-                        alignment: Alignment.topLeft,
-                        firstChild: Text(
+                  ConditionalReturn(
+                    authState.register,
+                    builder: (context) => Padding(
+                      padding: 20.0.padLEFT,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
                           'Welcome to Ismail\nChat App',
                           style: context.textTheme.headline4.copyWith(
                             color: context.theme.accentColor,
@@ -60,6 +53,7 @@ class Auth extends GetView<AuthController> {
                   ),
                   _Build(
                     submit: _submit,
+                    authState: authState,
                     controller: controller,
                     usernameFocusNode: usernameFocusNode,
                     emailFocusNode: emailFocusNode,
@@ -76,6 +70,39 @@ class Auth extends GetView<AuthController> {
   }
 }
 
+class Login extends StatelessWidget {
+  const Login({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Auth(
+      authState: AuthState.Login,
+    );
+  }
+}
+
+class Register extends StatelessWidget {
+  const Register({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Auth(
+      authState: AuthState.Registration,
+    );
+  }
+}
+
+class ForgotPass extends StatelessWidget {
+  const ForgotPass({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Auth(
+      authState: AuthState.ForgotPass,
+    );
+  }
+}
+
 class _Build extends StatelessWidget {
   _Build({
     Key key,
@@ -85,6 +112,7 @@ class _Build extends StatelessWidget {
     @required this.emailFocusNode,
     @required this.passFocusNode,
     @required this.conPassFocusNode,
+    this.authState,
   }) : super(
           key: key,
         );
@@ -94,6 +122,7 @@ class _Build extends StatelessWidget {
   final FocusNode emailFocusNode;
   final FocusNode passFocusNode;
   final FocusNode conPassFocusNode;
+  final AuthState authState;
 
   Widget _buildSubmitButton(AuthState state) {
     switch (state) {
@@ -155,25 +184,20 @@ class _Build extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizeTransition(
-            sizeFactor: controller.usernameSizeAnimation,
-            child: SlideTransition(
-              position: controller.usernameSlideAnimation,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Obx(
-                  () => DefaultTextField(
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.person),
-                    ),
-                    focusNode: usernameFocusNode,
-                    textInputAction: TextInputAction.next,
-                    onFieldSubmitted: (_) => emailFocusNode.requestFocus(),
-                    tec: controller.usernameTec,
-                    label: 'Username',
-                    mandatory: controller.authState.register,
-                  ),
+          ConditionalReturn(
+            authState.register,
+            builder: (context) => Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: DefaultTextField(
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person),
                 ),
+                focusNode: usernameFocusNode,
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (_) => emailFocusNode.requestFocus(),
+                tec: controller.usernameTec,
+                label: 'Username',
+                mandatory: authState.register,
               ),
             ),
           ),
@@ -194,115 +218,105 @@ class _Build extends StatelessWidget {
             label: 'Email',
             mandatory: true,
           ),
-          SizeTransition(
-            sizeFactor: controller.passSizeAnimation,
-            child: SlideTransition(
-              position: controller.passSlideAnimation,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
-                child: Obx(() => DefaultTextField.password(
-                      false,
-                      mandatory: !controller.authState.forgotPass,
-                      focusNode: passFocusNode,
-                      textInputAction: controller.authState.register
-                          ? TextInputAction.next
-                          : TextInputAction.done,
-                      tec: controller.passTec,
-                      onFieldSubmitted: (_) {
-                        if (controller.authState.register) {
-                          conPassFocusNode.requestFocus();
+          ConditionalReturn(
+            !authState.forgotPass,
+            builder: (context) => Padding(
+              padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
+              child: Obx(
+                () => DefaultTextField.password(
+                  false,
+                  mandatory: !authState.forgotPass,
+                  focusNode: passFocusNode,
+                  textInputAction: authState.register
+                      ? TextInputAction.next
+                      : TextInputAction.done,
+                  tec: controller.passTec,
+                  onFieldSubmitted: (_) {
+                    if (authState.register) {
+                      conPassFocusNode.requestFocus();
+                    } else {
+                      submit();
+                    }
+                  },
+                  hidePass: () => controller.obscure(true),
+                  showPass: () => controller.obscure(false),
+                  obscure: controller.obscure.value,
+                ),
+              ),
+            ),
+          ),
+          ConditionalReturn(
+            authState.register,
+            builder: (context) => Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: Obx(
+                () => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    DefaultTextField.password(
+                      true,
+                      mandatory: authState.register,
+                      tec: controller.conPassTec,
+                      onFieldSubmitted: (_) => submit(),
+                      focusNode: conPassFocusNode,
+                      validator: (value) {
+                        if (!authState.register) return null;
+                        if (value != controller.passTec.text) {
+                          return 'Password mismatch';
                         } else {
-                          submit();
+                          return null;
                         }
                       },
-                      hidePass: () => controller.obscure(true),
-                      showPass: () => controller.obscure(false),
-                      obscure: controller.obscure.value,
-                    )),
-              ),
-            ),
-          ),
-          SizeTransition(
-            sizeFactor: controller.conPassSizeAnimation,
-            child: SlideTransition(
-              position: controller.conPassSlideAnimation,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Obx(
-                  () => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      DefaultTextField.password(
-                        true,
-                        mandatory: controller.authState.register,
-                        tec: controller.conPassTec,
-                        onFieldSubmitted: (_) => submit(),
-                        focusNode: conPassFocusNode,
-                        validator: (value) {
-                          if (!controller.authState.register) return null;
-                          if (value != controller.passTec.text) {
-                            return 'Password mismatch';
-                          } else {
-                            return null;
-                          }
-                        },
-                        hidePass: () => controller.conObscure(true),
-                        showPass: () => controller.conObscure(false),
-                        obscure: controller.conObscure.value,
-                      ),
-                      20.0.sizedHeight,
-                      Text('Gender'),
-                      Row(),
-                    ],
-                  ),
+                      hidePass: () => controller.conObscure(true),
+                      showPass: () => controller.conObscure(false),
+                      obscure: controller.conObscure.value,
+                    ),
+                    20.0.sizedHeight,
+                    Text('Gender'),
+                    Row(),
+                  ],
                 ),
               ),
             ),
           ),
           20.0.sizedHeight,
-          SizeTransition(
-            sizeFactor: controller.forgotPassButtonSizeAnimation,
-            child: SlideTransition(
-              position: controller.forgotPassButtonSlideAnimation,
-              child: Center(
-                child: TextButton(
-                  onPressed: () => controller.authState = AuthState.ForgotPass,
-                  child: Text(
-                    'Forgot Pass?',
-                    style: context.textTheme.subtitle1,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          20.0.sizedHeight,
-          Align(
-            child: Obx(
-              () => _buildSubmitButton(controller.authState),
-            ),
-          ),
-          20.0.sizedHeight,
-          Align(
-            child: Obx(
-              () => TextButton(
+          ConditionalReturn(
+            authState.login,
+            builder: (context) => Center(
+              child: TextButton(
+                onPressed: () => ForgotPass().to(),
                 child: Text(
-                  controller.authStateChangeButtonTitle,
+                  'Forgot Pass?',
                   style: context.textTheme.subtitle1,
                 ),
-                onPressed: () {
-                  switch (controller.authState) {
-                    case AuthState.ForgotPass:
-                    case AuthState.Registration:
-                      controller.authState = AuthState.Login;
-                      break;
-                    case AuthState.Login:
-                      controller.authState = AuthState.Registration;
-                      break;
-                    default:
-                  }
-                },
               ),
+            ),
+          ),
+          20.0.sizedHeight,
+          Align(
+            child: _buildSubmitButton(authState),
+          ),
+          20.0.sizedHeight,
+          Align(
+            child: TextButton(
+              child: Text(
+                controller.authStateChangeButtonTitle,
+                style: context.textTheme.subtitle1,
+              ),
+              onPressed: () {
+                trace(authState);
+                switch (authState) {
+                  case AuthState.ForgotPass:
+                  case AuthState.Registration:
+                    Login().to();
+                    break;
+                  case AuthState.Login:
+                    Register().to();
+                    break;
+                  default:
+                }
+              },
             ),
           ),
         ],
