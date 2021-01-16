@@ -4,7 +4,6 @@ import 'package:firebase_chat_app/ui/ui.dart';
 import 'package:firebase_chat_app/utils/utils.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:graphx/graphx.dart';
 
 enum SubmitState {
   Loading,
@@ -70,6 +69,10 @@ class AuthController extends GetxController with SingleGetTickerProviderMixin {
       _submitState(SubmitState.Success);
       await 1000.milliseconds.delay();
       _submitState(SubmitState.Idle);
+      Get.offAll(
+        UserProfile(),
+        binding: BindingsBuilder.put(() => UserProfileController()),
+      );
     } catch (e) {
       _submitState(SubmitState.Error);
       showErrorSnackBar(body: e.toString());

@@ -100,12 +100,13 @@ class UserCrud {
     );
   }
 
-  void deleteUser({String id}) {
-    firebaseService.crud(
+  Future<String> deleteUser({String id}) async {
+    return await firebaseService.crud(
       CrudState.delete,
       wantLoading: false,
       collection: Collection,
       model: UserModel(),
+      id: id,
     );
   }
 }

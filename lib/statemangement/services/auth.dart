@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_chat_app/ui/ui.dart';
 import 'package:firebase_chat_app/utils/utils.dart';
@@ -7,7 +5,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphx/graphx.dart';
-import 'package:path/path.dart' as p;
 import '../statemangement.dart';
 
 class AuthService extends GetxService {
@@ -27,55 +24,132 @@ class AuthService extends GetxService {
 
   Future<void> verifyEmail() async {
     currentUser.reload();
+
     if (!currentUser.emailVerified) {
-      await currentUser.sendEmailVerification();
+      try {
+        await currentUser.sendEmailVerification();
+      } on FirebaseAuthException catch (e) {
+        showErrorSnackBar(body: _firebaseService.firebaseErrors(e.code));
+      }
     } else {
-      await UserCrud().updateuser(
-        user: UserModel(
-          email: currentUser.email,
-          id: currentUser.uid,
-          displayName: currentUser.displayName,
-          emailVerified: true,
+      try {
+        final String msg = await UserCrud().updateuser(
+          user: UserModel(
+            email: currentUser.email,
+            id: currentUser.uid,
+            displayName: currentUser.displayName,
+            emailVerified: true,
+          ),
+        );
+        showSuccessSnackBar(body: msg);
+      } catch (e) {
+        showErrorSnackBar(body: e.toString());
+      }
+    }
+  }
+
+  Future<void> updateDeleteUser(bool isUpdate, {UserModel val}) async {
+    final obscure = true.obs;
+    final TextEditingController tec = TextEditingController();
+
+    openDialog(
+      child: AlertDialog(
+        title: Text(
+          'Please enter your pasword and confirm to ${isUpdate ? 'update your profile' : 'Delete your profile'}',
+        ),
+        scrollable: true,
+        content: Column(
+          children: [
+            DefaultTextField.password(
+              false,
+              tec: tec,
+              obscure: obscure.value,
+              showPass: () => obscure(false),
+              hidePass: () => obscure(true),
+              mandatory: true,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              if (tec.text == '' || tec.text == null) {
+                showErrorSnackBar(body: 'Please enter your password');
+                return;
+              }
+              Get.back();
+              AuthCredential credential = EmailAuthProvider.credential(
+                email: currentUser.email,
+                password: tec.text,
+              );
+              try {
+                await auth.currentUser.reauthenticateWithCredential(credential);
+                if (isUpdate) {
+                  _updateUser(val);
+                } else {
+                  _deleteUser();
+                }
+              } on FirebaseAuthException catch (e) {
+                showErrorSnackBar(
+                  body: _firebaseService.firebaseErrors(e.code),
+                );
+              }
+            },
+            child: Text('Confirm'),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _updateFirebaseUser(UserModel val) async {
+    if (val.email != null && val.email != currentUser.email) {
+      await currentUser.updateEmail(
+        val.email,
+      );
+    } else if (val.displayName != null &&
+        val.displayName != currentUser.displayName) {
+      await currentUser.updateProfile(
+        displayName: val.displayName,
+      );
+    } else if (val.photoURL != null &&
+        val.photoURL != '' &&
+        val.photoURL != currentUser.photoURL) {
+      await _firebaseService.uploadFile(
+        child: 'profileimages',
+        fileName: currentUser.uid,
+        fileURL: val.photoURL,
+      );
+      await currentUser.updateProfile(
+        photoURL: await _firebaseService.getDownloadURL(
+          child: 'profileimages',
+          fileName: currentUser.uid,
         ),
       );
     }
   }
 
-  Future<void> updateUser(UserModel val) async {
-    trace(val.id);
+  Future<void> _updateUser(UserModel val) async {
     if (val == null) return;
-    trace(val.id);
-    // debugger();
+
     if (val.displayName == currentUser.displayName &&
         val.email == currentUser.email &&
         val.photoURL == currentUser.photoURL) {
       showInfoSnackBar(body: 'Nothing to update');
       return;
     }
+
     await showLoadingWithProggress(
       wantProggress: false,
     );
     try {
-      if (val.email != null && val.email != currentUser.email) {
-        await currentUser.updateEmail(
-          val.email,
-        );
-      } else if (val.displayName != null &&
-          val.displayName != currentUser.displayName) {
-        await currentUser.updateProfile(
-          displayName: val.displayName,
-        );
-      } else if (val.photoURL != null && val.photoURL != currentUser.photoURL) {
-        final File _photo = File(val.photoURL);
-        String _fileName =
-            "${p.basename(currentUser.uid)}${p.extension(val.photoURL)}";
-        final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
-        final Reference _ref =
-            _firebaseStorage.ref().child('/profileimages/$_fileName');
-        await _ref.putFile(_photo);
-        final String _photoUrl = await _ref.getDownloadURL();
-        await currentUser.updateProfile(photoURL: _photoUrl);
-      }
+      await _updateFirebaseUser(val);
       final _user = UserModel(
         displayName: currentUser.displayName,
         email: currentUser.email,
@@ -90,6 +164,9 @@ class AuthService extends GetxService {
       Get.find<UserProfileController>().image = null;
       Get.find<UserProfileController>().imagePicked = false;
       Get.find<UserProfileController>().counter += 1;
+    } on FirebaseAuthException catch (e) {
+      Get.back();
+      showErrorSnackBar(body: _firebaseService.firebaseErrors(e.code));
     } catch (e) {
       Get.back();
       showErrorSnackBar(body: e.toString());
@@ -150,7 +227,7 @@ class AuthService extends GetxService {
           break;
         default:
       }
-
+      currentUser.reload();
       userController.fillUser(UserCrud().getUser(authResult.user.uid));
       return 'Sucessful';
     } on FirebaseAuthException catch (e) {
@@ -167,7 +244,26 @@ class AuthService extends GetxService {
     try {
       await auth.signOut();
       userController.user(UserModel());
+      Login().offAll(AuthBinding());
     } on FirebaseAuthException catch (e) {
+      showErrorSnackBar(body: _firebaseService.firebaseErrors(e.code));
+    }
+  }
+
+  Future<void> _deleteUser() async {
+    try {
+      await _firebaseService.deleteFile(
+        child: 'profileimages',
+        fileName: currentUser.uid,
+      );
+      final String msg = await UserCrud().deleteUser(
+        id: currentUser.uid,
+      );
+      await currentUser.delete();
+      showSuccessSnackBar(body: msg);
+    } on FirebaseAuthException catch (e) {
+      showErrorSnackBar(body: _firebaseService.firebaseErrors(e.code));
+    } on FirebaseException catch (e) {
       showErrorSnackBar(body: _firebaseService.firebaseErrors(e.code));
     }
   }

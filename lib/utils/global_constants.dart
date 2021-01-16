@@ -154,6 +154,7 @@ String dateFormat(DateTime date, {String format}) {
 }
 
 void confirmDialog({
+  bool wantLoading = true,
   Function(RxBool isLoading) onConfirm,
   String title,
   String body,
@@ -169,14 +170,16 @@ void confirmDialog({
         TextButton(
           child: TextToLoading(
             textColor: ErrorColor,
-            isLoading: isLoading,
+            isLoading: wantLoading ? isLoading : false.obs,
             text: 'Yes',
           ),
-          onPressed: () async {
-            isLoading(true);
-            await 800.milliseconds.delay();
-            onConfirm(isLoading);
-          },
+          onPressed: wantLoading
+              ? () async {
+                  isLoading(true);
+                  await 800.milliseconds.delay();
+                  onConfirm(isLoading);
+                }
+              : () => onConfirm(isLoading),
         ),
         TextButton(
           child: DefaultText(

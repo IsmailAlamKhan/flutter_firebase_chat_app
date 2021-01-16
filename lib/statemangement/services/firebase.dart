@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_chat_app/statemangement/models/models.dart';
 import 'package:firebase_chat_app/ui/ui.dart';
 import 'package:firebase_chat_app/utils/utils.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:get/state_manager.dart';
+import 'package:get/get.dart';
 import 'package:graphx/graphx.dart';
+import 'package:path/path.dart' as p;
 
 enum CrudState { add, update, delete }
 
@@ -14,6 +18,7 @@ typedef T SingleQuery<T extends BaseModel>(QuerySnapshot query);
 class FirebaseService<T extends BaseModel> extends GetxService {
   String firebaseErrors(String errorCode) {
     String message;
+    trace(errorCode);
     switch (errorCode) {
       case 'invalid-email':
         message = 'The email is badly formatted.';
@@ -29,7 +34,7 @@ class FirebaseService<T extends BaseModel> extends GetxService {
             'You already have an account with this email but with different credential.';
         break;
       case 'wrong-password':
-        message = 'Invalid login credentials.';
+        message = 'Invalid User credentials.';
         break;
       case 'network-request-failed':
         message = 'Please check your internet connection';
@@ -86,6 +91,9 @@ class FirebaseService<T extends BaseModel> extends GetxService {
       case 'not-found':
         message = 'The Document is not found.';
         break;
+      case 'object-not-found':
+        message = 'Could not find the file or the photo.';
+        break;
       default:
         message = 'Oops! Something went wrong. Try again later.';
         break;
@@ -102,10 +110,16 @@ class FirebaseService<T extends BaseModel> extends GetxService {
     @required String collection,
     @required T model,
     bool wantLoading = true,
+    String id,
   }) async {
     if (crudState != CrudState.delete && data == null)
       return Future.error(
-          'You need to provide data if you are updating or adding');
+        'You need to provide data if you are updating or adding',
+      );
+    if (crudState == CrudState.delete && id == null)
+      return Future.error(
+        'You need to provide id if you are deleting',
+      );
     if (wantLoading) {
       trace(wantLoading);
       await showLoadingWithProggress(
@@ -116,6 +130,7 @@ class FirebaseService<T extends BaseModel> extends GetxService {
         collection,
         data,
         model,
+        id,
       );
     } else {
       return await _crud(
@@ -123,6 +138,7 @@ class FirebaseService<T extends BaseModel> extends GetxService {
         collection,
         data,
         model,
+        id,
       );
     }
   }
@@ -132,6 +148,7 @@ class FirebaseService<T extends BaseModel> extends GetxService {
     String collection,
     Map<String, dynamic> data,
     T model,
+    String id,
   ) async {
     try {
       String _crudMessege = '';
@@ -146,7 +163,7 @@ class FirebaseService<T extends BaseModel> extends GetxService {
           break;
         case CrudState.delete:
           _crudMessege = 'Deleted';
-          await _firestore.collection(collection).doc(model.id).delete();
+          await _firestore.collection(collection).doc(id).delete();
           break;
         default:
       }
@@ -172,6 +189,48 @@ class FirebaseService<T extends BaseModel> extends GetxService {
           .collection(collection)
           .snapshots()
           .map((QuerySnapshot query) => returnVal(query));
+
+  Future<void> uploadFile({
+    String fileName,
+    String fileURL,
+    String child,
+  }) async {
+    final File _file = File(fileURL);
+    await _getRef(
+      fileName,
+      child,
+    ).putFile(_file);
+  }
+
+  Future<void> deleteFile({
+    String fileName,
+    String child,
+  }) async {
+    await _getRef(
+      fileName,
+      child,
+    ).delete();
+  }
+
+  Reference _getRef(
+    String fileName,
+    String child,
+  ) {
+    String _fileName = p.basename(fileName);
+    final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
+    final Reference _ref = _firebaseStorage.ref().child('/$child/$_fileName');
+    return _ref;
+  }
+
+  Future<String> getDownloadURL({
+    String child,
+    String fileName,
+  }) async {
+    return await _getRef(
+      fileName,
+      child,
+    ).getDownloadURL();
+  }
 }
 
 abstract class FirebaseCollections {
