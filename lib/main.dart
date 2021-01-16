@@ -6,8 +6,8 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:graphx/graphx.dart';
 
-import 'statemangement/statemangement.dart';
-import 'ui/ui.dart';
+import 'statemangement/index.dart';
+import 'ui/index.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,10 +49,27 @@ class MyApp extends StatelessWidget {
         primaryColor: Color(0xFF3CE261),
         textTheme: GoogleFonts.poppinsTextTheme(),
         scaffoldBackgroundColor: Colors.white,
+        appBarTheme: AppBarTheme(
+          brightness: Brightness.dark,
+          textTheme: context.textTheme,
+        ),
       ),
       darkTheme: ThemeData(
         scaffoldBackgroundColor: Color(0xFF16162C),
         brightness: Brightness.dark,
+        appBarTheme: AppBarTheme(
+          brightness: Brightness.dark,
+          iconTheme: IconThemeData(
+            color: Colors.white,
+          ),
+          actionsIconTheme: IconThemeData(
+            color: Colors.white,
+          ),
+          textTheme: GoogleFonts.poppinsTextTheme(
+            ThemeData(brightness: Brightness.dark).textTheme,
+          ),
+        ),
+        accentColor: Colors.amber,
         textTheme: GoogleFonts.poppinsTextTheme(
           ThemeData(brightness: Brightness.dark).textTheme,
         ),

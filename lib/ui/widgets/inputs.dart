@@ -1,3 +1,4 @@
+import 'package:firebase_chat_app/ui/index.dart';
 import 'package:get/get.dart';
 
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class DefaultTextField extends StatelessWidget {
   final String label;
   DefaultTextField.password(
     bool isConPaas, {
+    bool dense = false,
     this.tec,
     @required this.obscure,
     @required VoidCallback showPass,
@@ -37,7 +39,8 @@ class DefaultTextField extends StatelessWidget {
     @required this.mandatory,
   })  : label = isConPaas ? 'Confirm Password' : 'Password',
         decoration = InputDecoration(
-          prefixIcon: Icon(
+          isDense: dense,
+          prefixIcon: DefaultIcon(
             Icons.lock,
           ),
           suffixIcon: AnimatedCrossFade(
@@ -86,7 +89,7 @@ class DefaultTextField extends StatelessWidget {
                 labelText: _labelText,
               )
             : decoration.copyWith(
-                border: UnderlineInputBorder(),
+                border: decoration.border ?? UnderlineInputBorder(),
                 labelText: _labelText,
               ),
       ),

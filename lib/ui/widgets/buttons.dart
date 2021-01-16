@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:firebase_chat_app/ui/ui.dart';
-import 'package:firebase_chat_app/utils/utils.dart';
+import 'package:firebase_chat_app/ui/index.dart';
+import 'package:firebase_chat_app/utils/index.dart';
 
 const String LOGINTAG = 'LOGIN';
 const String REGTAG = 'Register';
@@ -98,7 +98,7 @@ class RoundedLoadingButton extends StatelessWidget {
           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
         ),
       ),
-      secondChild: Icon(
+      secondChild: DefaultIcon(
         submitState.success ? Icons.check : Icons.close,
         color: Colors.white,
       ),

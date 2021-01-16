@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:firebase_chat_app/utils/utils.dart';
+import 'package:firebase_chat_app/utils/index.dart';
 
 class DefaultText extends StatelessWidget {
   const DefaultText(

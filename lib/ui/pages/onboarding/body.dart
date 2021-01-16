@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:graphx/graphx.dart';
 
-import 'package:firebase_chat_app/ui/ui.dart';
-import 'package:firebase_chat_app/utils/utils.dart';
+import 'package:firebase_chat_app/ui/index.dart';
+import 'package:firebase_chat_app/utils/index.dart';
 
 class OnBoardingPage extends GetView<OnboardingController> {
   const OnBoardingPage({Key key}) : super(key: key);

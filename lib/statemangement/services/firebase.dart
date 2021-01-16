@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_chat_app/statemangement/models/models.dart';
-import 'package:firebase_chat_app/ui/ui.dart';
-import 'package:firebase_chat_app/utils/utils.dart';
+import 'package:firebase_chat_app/statemangement/index.dart';
+import 'package:firebase_chat_app/ui/index.dart';
+import 'package:firebase_chat_app/utils/index.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

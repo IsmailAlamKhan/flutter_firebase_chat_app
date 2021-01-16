@@ -2,17 +2,17 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_chat_app/statemangement/statemangement.dart';
-import 'package:firebase_chat_app/utils/utils.dart';
+import 'package:firebase_chat_app/ui/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphx/graphx.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
-const double ProfilePicSize = 200;
+import 'package:firebase_chat_app/statemangement/index.dart';
+import 'package:firebase_chat_app/utils/index.dart';
 
-class UserProfileController extends GetxController {
+class UserProfileController extends BaseController {
   final _userHasPicture = false.obs;
   final _imagePicked = false.obs;
 
@@ -47,6 +47,12 @@ class UserProfileController extends GetxController {
   Worker userWorker;
   @override
   void onInit() {
+    displayNameTEC = TextEditingController(
+      text: authController.currentUser?.displayName,
+    );
+    emailTEC = TextEditingController(
+      text: authController.currentUser?.email,
+    );
     userWorker = ever(authController.user, (User user) {
       _userHasPicture(
         (user?.photoURL != null && user?.photoURL != '') ?? false,
@@ -137,7 +143,7 @@ class UserProfileController extends GetxController {
                 showErrorSnackBar(body: e.message);
               }
             },
-            icon: Icon(Icons.photo),
+            icon: DefaultIcon(Icons.photo),
             label: Text('Gallery'),
           ),
         ],
@@ -152,10 +158,10 @@ class UserProfileController extends GetxController {
         fit: BoxFit.cover,
       );
     }
-    if (authController.currentUser.photoURL != null &&
-        authController.currentUser.photoURL != '') {
+    if (authController.currentUser?.photoURL != null &&
+        authController.currentUser?.photoURL != '') {
       return CachedNetworkImage(
-        imageUrl: authController.currentUser.photoURL,
+        imageUrl: authController.currentUser?.photoURL,
         fit: BoxFit.cover,
         placeholder: (_, __) => Center(
           child: CircularProgressIndicator(),

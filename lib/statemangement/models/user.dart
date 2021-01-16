@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_chat_app/utils/utils.dart';
+import 'package:firebase_chat_app/utils/index.dart';
 import 'package:get/get.dart';
-import 'package:firebase_chat_app/statemangement/statemangement.dart';
+import 'package:firebase_chat_app/statemangement/index.dart';
 import 'package:graphx/graphx.dart';
 
 class UserModel extends BaseModel {

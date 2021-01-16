@@ -1,10 +1,10 @@
-import 'package:firebase_chat_app/ui/ui.dart';
+import 'package:firebase_chat_app/ui/index.dart';
 
-import 'utils.dart';
+import 'index.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:firebase_chat_app/statemangement/statemangement.dart';
+import 'package:firebase_chat_app/statemangement/index.dart';
 
 const _chars = 'AabCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
 Random _rnd = Random();

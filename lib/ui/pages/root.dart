@@ -1,8 +1,8 @@
-import 'package:firebase_chat_app/statemangement/statemangement.dart';
+import 'package:firebase_chat_app/statemangement/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../ui.dart';
+import '../index.dart';
 
 class Root extends StatelessWidget {
   const Root({Key key}) : super(key: key);
@@ -13,8 +13,8 @@ class Root extends StatelessWidget {
       init: AuthService(),
       builder: (AuthService controller) {
         if (controller.user.value?.uid != null) {
-          Get.put(UserProfileController());
-          return UserProfile();
+          Get.put(HomeController());
+          return Home();
         } else {
           return Login();
         }

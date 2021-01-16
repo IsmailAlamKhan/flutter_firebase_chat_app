@@ -1,4 +1,4 @@
-import 'package:firebase_chat_app/ui/widgets/widgets.dart';
+import 'package:firebase_chat_app/ui/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';

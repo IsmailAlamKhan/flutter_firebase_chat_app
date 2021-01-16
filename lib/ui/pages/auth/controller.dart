@@ -1,7 +1,6 @@
-import 'package:firebase_chat_app/statemangement/statemangement.dart';
-import 'package:firebase_chat_app/ui/pages/auth/auth.dart';
-import 'package:firebase_chat_app/ui/ui.dart';
-import 'package:firebase_chat_app/utils/utils.dart';
+import 'package:firebase_chat_app/statemangement/index.dart';
+import 'package:firebase_chat_app/ui/index.dart';
+import 'package:firebase_chat_app/utils/index.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
@@ -19,7 +18,7 @@ class AuthBinding implements Bindings {
   }
 }
 
-class AuthController extends GetxController with SingleGetTickerProviderMixin {
+class AuthController extends BaseController with SingleGetTickerProviderMixin {
   final AuthService _authController = Get.find();
 
   final _submitButtonWidth = 150.0.obs;
@@ -70,8 +69,7 @@ class AuthController extends GetxController with SingleGetTickerProviderMixin {
       await 1000.milliseconds.delay();
       _submitState(SubmitState.Idle);
       Get.offAll(
-        UserProfile(),
-        binding: BindingsBuilder.put(() => UserProfileController()),
+        Home(),
       );
     } catch (e) {
       _submitState(SubmitState.Error);

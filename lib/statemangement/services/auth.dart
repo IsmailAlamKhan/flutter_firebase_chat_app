@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_chat_app/ui/ui.dart';
-import 'package:firebase_chat_app/utils/utils.dart';
+import 'package:firebase_chat_app/ui/index.dart';
+import 'package:firebase_chat_app/utils/index.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphx/graphx.dart';
-import '../statemangement.dart';
+import '../index.dart';
 
 class AuthService extends GetxService {
   final FirebaseService _firebaseService = Get.find();
