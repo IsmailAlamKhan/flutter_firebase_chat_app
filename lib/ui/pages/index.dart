@@ -7,3 +7,4 @@ export 'auth/index.dart';
 export 'home/index.dart';
 export 'onboarding/index.dart';
 export 'user_profile/index.dart';
+export 'chat/index.dart';

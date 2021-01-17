@@ -177,7 +177,7 @@ class FirebaseService<T extends BaseModel> extends GetxService {
     }
   }
 
-  Stream<List<T>> getListStream([ListQuery<T> returnVal, String collection]) =>
+  Stream<List<T>> getListStream({ListQuery<T> returnVal, String collection}) =>
       _firestore
           .collection(collection)
           .orderBy('dateCreated')
@@ -235,4 +235,6 @@ class FirebaseService<T extends BaseModel> extends GetxService {
 
 abstract class FirebaseCollections {
   static const USER = 'users';
+
+  static const CHAT = 'chats';
 }

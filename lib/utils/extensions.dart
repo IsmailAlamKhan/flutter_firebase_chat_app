@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_chat_app/ui/index.dart';
 
 import 'index.dart';
@@ -8,6 +9,13 @@ import 'package:firebase_chat_app/statemangement/index.dart';
 
 const _chars = 'AabCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
 Random _rnd = Random();
+
+extension ExtendedTimeStamp on Timestamp {
+  String convertToString([String format]) => dateFormat(
+        this.toDate(),
+        format: format,
+      );
+}
 
 extension ExtendedString on String {
   ///String to date

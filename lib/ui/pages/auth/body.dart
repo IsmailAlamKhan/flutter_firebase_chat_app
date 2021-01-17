@@ -19,7 +19,7 @@ class Auth extends GetView<AuthController> {
 
   void _submit() {
     if (!_formKey.currentState.validate()) {
-      showErrorSnackBar(body: 'Please enter the mandatory fields');
+      showErrorSnackBar(body: 'Please fix the issues');
       return;
     } else {
       controller.submit(authState);

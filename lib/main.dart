@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_multi_formatter/utils/unfocuser.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,6 +22,7 @@ Future<void> main() async {
     showMethodname: true,
   );
   Get.put(FirebaseService());
+  Get.put(UserCrud());
   Get.put(UserController());
   Get.put(AuthService());
   runApp(MyApp());
@@ -76,7 +78,9 @@ class MyApp extends StatelessWidget {
         primaryColor: Color(0xFF3CE261),
       ),
       initialBinding: AuthBinding(),
-      home: ('onBoarding'.getValue ?? false) ? Root() : OnBoardingPage(),
+      home: Unfocuser(
+        child: ('onBoarding'.getValue ?? false) ? Root() : OnBoardingPage(),
+      ),
     );
   }
 }

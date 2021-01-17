@@ -56,6 +56,32 @@ class UserCrud {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   static const String Collection = FirebaseCollections.USER;
+  Stream<List<UserModel>> get getUsers {
+    return firebaseService.getListStream(
+      collection: Collection,
+      returnVal: (query) {
+        final retVal = <UserModel>[];
+        query.docs.forEach((element) {
+          retVal.add(UserModel.fromDocumentSnapshot(documentSnapshot: element));
+        });
+        return retVal;
+      },
+    );
+  }
+
+  Stream<String> getPhotoUrl(String uid) {
+    return _firestore
+        .collection(Collection)
+        .doc(uid)
+        .snapshots()
+        .map((DocumentSnapshot element) {
+      final _user = UserModel.fromDocumentSnapshot(
+        documentSnapshot: element,
+      );
+      return _user.photoURL;
+    });
+  }
+
   Stream<UserModel> getUser(String uid) {
     return _firestore
         .collection(Collection)

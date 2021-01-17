@@ -37,9 +37,17 @@ class Home extends GetView<HomeController> {
           ),
         ],
       ),
-      body: ListView(
+      body: Column(
         children: [
           AppBarBottom(),
+          ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Colors.red,
+            ),
+            title: Text('Test User'),
+            onTap: () => Get.to(ChatScreen(),
+                binding: BindingsBuilder.put(() => ChatController())),
+          ),
         ],
       ),
     );
