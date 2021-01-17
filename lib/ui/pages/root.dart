@@ -17,7 +17,9 @@ class Root extends StatelessWidget {
           Get.put(HomeController());
           return Home();
         } else {
-          return Login();
+          return Auth(
+            authState: AuthState.Login,
+          );
         }
       },
     );

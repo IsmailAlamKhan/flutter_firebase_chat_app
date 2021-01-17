@@ -71,7 +71,9 @@ class OnBoardingPage extends GetView<OnboardingController> {
                   onTap: () {
                     GetStorage box = GetStorage();
                     box.write('onBoarding', true);
-                    Register().offAll(
+                    Auth(
+                      authState: AuthState.Registration,
+                    ).offAll(
                       AuthBinding(),
                     );
                   },

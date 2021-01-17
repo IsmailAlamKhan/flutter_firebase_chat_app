@@ -244,7 +244,9 @@ class AuthService extends GetxService {
     try {
       await auth.signOut();
       userController.user(UserModel());
-      Login().offAll(AuthBinding());
+      Auth(
+        authState: AuthState.Login,
+      ).offAll(AuthBinding());
     } on FirebaseAuthException catch (e) {
       showErrorSnackBar(body: _firebaseService.firebaseErrors(e.code));
     }
