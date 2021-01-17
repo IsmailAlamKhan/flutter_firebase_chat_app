@@ -41,9 +41,7 @@ class ChatController extends GetxController {
 
   Future<void> sendMessege(BuildContext context) async {
     try {
-      _loading(true);
       FocusScope.of(context).unfocus();
-      await 500.milliseconds.delay();
       await crud.addchat(
         chat: Chat(
           uidFrom: _authController.currentUser.uid,
@@ -51,8 +49,6 @@ class ChatController extends GetxController {
         ),
       );
       tec.clear();
-      _loading(false);
-      await 500.milliseconds.delay();
       scrollController.animateTo(
         scrollController.position.maxScrollExtent,
         duration: 500.milliseconds,

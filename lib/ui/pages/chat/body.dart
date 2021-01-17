@@ -34,16 +34,12 @@ class ChatScreen extends GetView<ChatController> {
                           );
                   String _photoUrl = _user?.photoURL;
                   String _userName = _user?.displayName;
-                  return Column(
-                    children: [
-                      ChatTile(
-                        id: data.id,
-                        imageURL: _photoUrl,
-                        messege: data.messege ?? '',
-                        name: _userName ?? '',
-                        sent: data.dateCreated.convertToString() ?? '',
-                      ),
-                    ],
+                  return ChatTile(
+                    id: data.id,
+                    imageURL: _photoUrl,
+                    messege: data.messege ?? '',
+                    name: _userName ?? '',
+                    sent: data.dateCreated.convertToString() ?? '',
                   );
                 },
               ),

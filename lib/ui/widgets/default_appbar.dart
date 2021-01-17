@@ -22,6 +22,7 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Obx(
       () {
+        if (authController.currentUser == null) return SizedBox.shrink();
         if (!authController.currentUser.emailVerified) {
           return AppBar(
             backgroundColor: Colors.transparent,

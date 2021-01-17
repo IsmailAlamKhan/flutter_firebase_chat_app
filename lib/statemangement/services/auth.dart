@@ -231,7 +231,7 @@ class AuthService extends GetxService {
       userController.fillUser(UserCrud().getUser(authResult.user.uid));
       return 'Sucessful';
     } on FirebaseAuthException catch (e) {
-      trace(e.code);
+      trace(e);
       return Future.error(_firebaseService.firebaseErrors(e.code));
     } on FirebaseException catch (e) {
       return Future.error(_firebaseService.firebaseErrors(e.code));

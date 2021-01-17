@@ -3,6 +3,7 @@ import 'package:firebase_chat_app/ui/index.dart';
 import 'package:firebase_chat_app/utils/index.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:graphx/graphx.dart';
 
 enum SubmitState {
   Loading,
@@ -14,7 +15,7 @@ enum SubmitState {
 class AuthBinding implements Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<AuthController>(() => AuthController());
+    Get.put(AuthController());
   }
 }
 
@@ -35,10 +36,7 @@ class AuthController extends BaseController with SingleGetTickerProviderMixin {
     return 'Register';
   }
 
-  // final _authState = AuthState.Login.obs;
-  // AuthState get authState => _authState.value;
-  // set authState(AuthState value) => _authState(value);
-
+  final StorageService _storageService = StorageService();
   final _submitState = SubmitState.Idle.obs;
   SubmitState get submitState => _submitState.value;
   set submitState(SubmitState value) => _submitState(value);
@@ -61,6 +59,8 @@ class AuthController extends BaseController with SingleGetTickerProviderMixin {
         email: emailTec.text,
         password: passTec.text,
       );
+      await _storageService.write('email', emailTec.text);
+      await _storageService.write('password', passTec.text);
       usernameTec.clear();
       emailTec.clear();
       passTec.clear();
@@ -89,7 +89,15 @@ class AuthController extends BaseController with SingleGetTickerProviderMixin {
   }
 
   @override
-  void onInit() {
+  Future<void> onReady() async {
+    trace(await _storageService.read('password'));
+    super.onReady();
+  }
+
+  @override
+  Future<void> onInit() async {
+    passTec.text = await _storageService.read('password');
+    emailTec.text = await _storageService.read('email');
     _submitWorker = ever(_submitState, submitStateOnChange);
     super.onInit();
   }
