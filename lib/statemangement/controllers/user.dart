@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphx/graphx.dart';
 
-class UserController extends BaseController
-    with StateMixin<List<UserModel>>, WidgetsBindingObserver {
+class UserController extends BaseController with StateMixin<List<UserModel>> {
   final user = UserModel().obs;
   UserModel get currentUser => user.value;
   final list = <UserModel>[].obs;
@@ -42,27 +41,7 @@ class UserController extends BaseController
   void onClose() {
     _listWorker?.dispose();
     _userWorker?.dispose();
-    WidgetsBinding.instance.removeObserver(this);
     super.onClose();
-  }
-
-  @override
-  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-    trace(state);
-    if (state == AppLifecycleState.inactive) {
-      if (active) {
-        await UserCrud().updateUserStatus(
-          userStatus: UserStatus.Inactive,
-        );
-      }
-    }
-    if (state == AppLifecycleState.resumed) {
-      if (active) {
-        await UserCrud().updateUserStatus(
-          userStatus: UserStatus.Inactive,
-        );
-      }
-    }
   }
 
   void initListWorker(User val) {
@@ -73,6 +52,7 @@ class UserController extends BaseController
 
   @override
   void onReady() {
+    active = AuthService.to.loggedIn && currentUser.userStatus.active;
     initListWorker(AuthService.to.currentUser);
     _userWorker = ever(AuthService.to.user, (User val) {
       trace(val);
@@ -84,8 +64,6 @@ class UserController extends BaseController
   @override
   void onInit() {
     list.bindStream(crud.getUsers);
-    active = Get.put(AuthService()).loggedIn && currentUser.userStatus.active;
-    WidgetsBinding.instance.addObserver(this);
     super.onInit();
   }
 }

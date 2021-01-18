@@ -18,7 +18,8 @@ class AuthService extends GetxService {
   User get currentUser => user.value;
   Worker _worker;
 
-  bool get loggedIn => currentUser.uid != null && currentUser.uid != '';
+  bool get loggedIn =>
+      (currentUser?.uid != null && currentUser?.uid != '') ?? false;
   @override
   void onInit() {
     user.bindStream(auth.authStateChanges());
