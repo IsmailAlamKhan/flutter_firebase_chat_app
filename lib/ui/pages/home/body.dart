@@ -49,23 +49,24 @@ class Home extends GetView<HomeController> {
           return ListView.builder(
             itemCount: state.length,
             itemBuilder: (context, index) {
-              final hasPhoto =
-                  state[index].photoURL != null && state[index].photoURL != '';
+              final _data = state[index];
+              final hasPhoto = _data.photoURL != null && _data.photoURL != '';
               return ListTile(
                 leading: CircleAvatar(
                   backgroundColor: context.theme.primaryColor,
                   backgroundImage: hasPhoto
                       ? CachedNetworkImageProvider(
-                          state[index].photoURL,
+                          _data.photoURL,
                         )
                       : AssetImage(
                           '$ImagePath/defaultDark.png',
                         ),
                 ),
-                title: Text(state[index].displayName),
+                trailing: _data.userStatus.active ? Icon(Icons.ballot) : null,
+                title: Text(_data.displayName),
                 onTap: () => Get.to(
                   ChatScreen(
-                    state[index].displayName,
+                    _data.displayName,
                   ),
                   binding: BindingsBuilder.put(
                     () => ChatController(),

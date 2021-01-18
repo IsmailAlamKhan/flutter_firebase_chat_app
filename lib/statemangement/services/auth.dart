@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_chat_app/ui/index.dart';
 import 'package:firebase_chat_app/utils/index.dart';
@@ -14,11 +16,21 @@ class AuthService extends GetxService {
   FirebaseAuth auth = FirebaseAuth.instance;
   Rx<User> user = Rx<User>();
   User get currentUser => user.value;
+  Worker _worker;
 
+  bool get loggedIn => currentUser.uid != null && currentUser.uid != '';
   @override
   void onInit() {
     user.bindStream(auth.authStateChanges());
     user.bindStream(auth.userChanges());
+    _worker = ever(user, (User val) async {
+      // debugger();
+      if (val != null && userController.currentUser?.id == null) {
+        await UserCrud().updateUserStatus(
+          userStatus: UserStatus.Active,
+        );
+      }
+    });
     super.onInit();
   }
 
@@ -186,6 +198,7 @@ class AuthService extends GetxService {
   @override
   void onClose() {
     userWorker?.dispose();
+    _worker?.dispose();
   }
 
   Future<String> doAuth(
@@ -225,7 +238,12 @@ class AuthService extends GetxService {
         default:
       }
       currentUser.reload();
-      userController.fillUser(UserCrud().getUser(authResult.user.uid));
+      await UserCrud().updateUserStatus(
+        userStatus: UserStatus.Active,
+      );
+      userController.fillUser(
+        UserCrud().getUser(authResult.user.uid),
+      );
       return 'Sucessful';
     } on FirebaseAuthException catch (e) {
       trace(e);
@@ -240,6 +258,9 @@ class AuthService extends GetxService {
   Future<void> logOut() async {
     try {
       await auth.signOut();
+      final _user = userController.currentUser;
+      _user.userStatus = UserStatus.Inactive;
+      await UserCrud().updateUserStatus(userStatus: UserStatus.Inactive);
       userController.user(UserModel());
       Auth(
         authState: AuthState.Login,

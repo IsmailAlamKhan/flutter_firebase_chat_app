@@ -275,7 +275,7 @@ class AuthController extends BaseController with SingleGetTickerProviderMixin {
 
   Future<void> changeToReg() async {
     _submitButtonTitle('Register');
-    _authStateChangeButtonTitle('Back');
+    _authStateChangeButtonTitle('Back To Login');
 
     usernameSizeController.forward();
     await 300.milliseconds.delay();
@@ -298,7 +298,7 @@ class AuthController extends BaseController with SingleGetTickerProviderMixin {
 
   Future<void> changeToForgotPass() async {
     _submitButtonTitle('Forgot Password');
-    _authStateChangeButtonTitle('Back');
+    _authStateChangeButtonTitle('Back To Login');
 
     forgotPassButtonController.reverse();
     passSlideController.reverse();
