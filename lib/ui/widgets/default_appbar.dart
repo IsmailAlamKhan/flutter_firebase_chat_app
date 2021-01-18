@@ -25,6 +25,7 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (authController.currentUser == null) return SizedBox.shrink();
         if (!authController.currentUser.emailVerified) {
           return AppBar(
+            elevation: 0,
             backgroundColor: Colors.transparent,
             title: GestureDetector(
               onTap: () async => await authController.verifyEmail(),
@@ -38,6 +39,7 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
           );
         }
         return AppBar(
+          elevation: 0,
           leading: leading,
           bottom: bottom,
           centerTitle: true,

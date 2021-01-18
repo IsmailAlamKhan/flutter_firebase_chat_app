@@ -30,57 +30,31 @@ class UserProfilePic extends StatelessWidget {
         authController.currentUser?.photoURL != '') {
       return CachedNetworkImage(
         imageUrl: authController.currentUser?.photoURL,
-        fit: BoxFit.cover,
-        placeholder: (_, __) => Center(
+        placeholder: (context, url) => Center(
           child: CircularProgressIndicator(),
         ),
       );
     }
     return Image.asset(
       '$ImagePath/defaultDark.png',
-      fit: BoxFit.cover,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      child: AnimatedContainer(
-        duration: 500.milliseconds,
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 10,
-              color: Colors.grey.shade300,
-              spreadRadius: -50,
-            )
-          ],
-          gradient: LinearGradient(
-            colors: [
-              context.theme.primaryColor.withOpacity(.5),
-              Colors.white,
-            ],
-            end: Alignment(2.0, 0.0),
-          ),
-          shape: BoxShape.circle,
-        ),
-        width: profilePicSize ?? ProfilePicSize,
-        height: profilePicSize ?? ProfilePicSize,
-        padding: EdgeInsets.all(isUserProfile ? 20 : 5),
+    return Container(
+      width: profilePicSize ?? ProfilePicSize,
+      height: profilePicSize ?? ProfilePicSize,
+      child: GestureDetector(
+        onTap: onTap,
         child: Obx(
           () => CircleAvatar(
             key: isUserProfile ? ValueKey<int>(counter) : null,
-            backgroundColor: context.theme.primaryColor,
-            child: ClipOval(
-              child: SizedBox(
-                width: ProfilePicSize,
-                height: ProfilePicSize,
-                child: Material(
-                  child: InkWell(
-                    onTap: onTap,
-                    child: _profilePic() ?? profilePic,
-                  ),
-                ),
+            backgroundColor: context.theme.primaryColor.withOpacity(.5),
+            child: Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: ClipOval(
+                child: profilePic ?? _profilePic(),
               ),
             ),
           ),

@@ -48,9 +48,10 @@ class AuthController extends BaseController with SingleGetTickerProviderMixin {
   final TextEditingController passTec = TextEditingController();
   final TextEditingController conPassTec = TextEditingController();
 
-  Future<void> submit(AuthState authState) async {
+  Future<void> submit() async {
     try {
       _submitState(SubmitState.Loading);
+
       await 300.milliseconds.delay();
       await _authController.doAuth(
         authState,

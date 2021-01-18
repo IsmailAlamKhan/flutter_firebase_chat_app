@@ -67,11 +67,18 @@ class UserProfile extends GetView<UserProfileController> {
                   20.0.sizedHeight,
                   Hero(
                     tag: 'user_profile',
-                    child: UserProfilePic(
-                      counter: controller.counter,
-                      isUserProfile: true,
-                      onTap: () => controller.pickPhoto(context),
-                      profilePic: controller.profilePic(),
+                    child: Obx(
+                      () {
+                        trace(controller.imagePicked);
+                        return UserProfilePic(
+                          counter: controller.counter,
+                          isUserProfile: true,
+                          onTap: () => controller.pickPhoto(context),
+                          profilePic: controller.imagePicked
+                              ? Image.file(controller.image)
+                              : null,
+                        );
+                      },
                     ),
                   ),
                   20.0.sizedHeight,

@@ -25,7 +25,6 @@ class UserModel extends BaseModel {
 
 //fromDocumentSnapshot
   UserModel.fromDocumentSnapshot({DocumentSnapshot documentSnapshot}) {
-    trace(documentSnapshot.data());
     id = documentSnapshot.id;
     dateCreated = documentSnapshot.data()["dateCreated"];
     displayName = documentSnapshot.data()["username"];

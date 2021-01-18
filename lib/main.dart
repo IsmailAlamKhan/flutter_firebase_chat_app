@@ -31,24 +31,18 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        statusBarBrightness: Brightness.light,
-        statusBarIconBrightness: Brightness.light,
-        statusBarColor: Colors.transparent,
-      ),
-    );
-
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
     ]);
     return GetMaterialApp(
       debugShowCheckedModeBanner: kDebugMode,
       title: 'Ismail Chat App',
       themeMode: ThemeMode.system,
       theme: ThemeData(
-        primaryColor: Color(0xFF3CE261),
+        primaryColor: Color(0xFF208CD4),
         textTheme: GoogleFonts.poppinsTextTheme(),
         scaffoldBackgroundColor: Colors.white,
         appBarTheme: AppBarTheme(
@@ -75,7 +69,7 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.poppinsTextTheme(
           ThemeData(brightness: Brightness.dark).textTheme,
         ),
-        primaryColor: Color(0xFF3CE261),
+        primaryColor: Color(0xFF208CD4),
       ),
       initialBinding: AuthBinding(),
       home: Unfocuser(

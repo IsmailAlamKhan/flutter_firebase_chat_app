@@ -40,7 +40,7 @@ class _AuthState extends State<Auth> {
       showErrorSnackBar(body: 'Please fix the issues');
       return;
     } else {
-      controller.submit(widget.authState);
+      controller.submit();
     }
   }
 
@@ -146,6 +146,7 @@ class _AuthState extends State<Auth> {
                           style: context.textTheme.subtitle1,
                         ),
                         onPressed: () {
+                          trace(controller.authState);
                           switch (controller.authState) {
                             case AuthState.ForgotPass:
                             case AuthState.Registration:
@@ -286,6 +287,7 @@ class _Build extends StatelessWidget {
                       mandatory: controller.authState.register,
                       tec: controller.conPassTec,
                       focusNode: conPassFocusNode,
+                      onFieldSubmitted: (_) => submit(),
                       validator: (value) {
                         if (!controller.authState.register) return null;
                         if (value != controller.passTec.text) {

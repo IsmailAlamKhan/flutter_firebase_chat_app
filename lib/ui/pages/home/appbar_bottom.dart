@@ -2,7 +2,7 @@ import 'package:firebase_chat_app/ui/index.dart';
 import 'package:firebase_chat_app/ui/widgets/inputs.dart';
 import 'package:flutter/material.dart';
 
-class AppBarBottom extends StatelessWidget {
+class AppBarBottom extends StatelessWidget implements PreferredSizeWidget {
   const AppBarBottom({Key key}) : super(key: key);
 
   @override
@@ -25,4 +25,7 @@ class AppBarBottom extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  Size get preferredSize => Size.fromHeight(90);
 }

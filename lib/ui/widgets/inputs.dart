@@ -1,7 +1,7 @@
-import 'package:firebase_chat_app/ui/index.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:flutter/material.dart';
+import 'package:firebase_chat_app/ui/index.dart';
 
 class DefaultTextField extends StatelessWidget {
   const DefaultTextField({
@@ -15,6 +15,7 @@ class DefaultTextField extends StatelessWidget {
     this.validator,
     this.mandatory = false,
     @required this.label,
+    this.maxLines = 1,
   }) : super(key: key);
   final TextEditingController tec;
   final InputDecoration decoration;
@@ -28,6 +29,7 @@ class DefaultTextField extends StatelessWidget {
   DefaultTextField.password(
     bool isConPaas, {
     bool dense = false,
+    this.maxLines = 1,
     this.tec,
     @required this.obscure,
     @required VoidCallback showPass,
@@ -60,7 +62,7 @@ class DefaultTextField extends StatelessWidget {
   String get _labelText => mandatory
       ? label.substring(0, 1).toUpperCase() + label.substring(1) + '*'
       : label.substring(0, 1).toUpperCase() + label.substring(1);
-
+  final int maxLines;
   @override
   Widget build(BuildContext context) {
     return IconTheme(
@@ -68,6 +70,7 @@ class DefaultTextField extends StatelessWidget {
         size: 40,
       ),
       child: TextFormField(
+        maxLines: maxLines,
         validator: (value) {
           if (mandatory) {
             if (value == '') return '$label is required';

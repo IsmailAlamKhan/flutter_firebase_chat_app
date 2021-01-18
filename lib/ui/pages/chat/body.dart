@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,25 +7,30 @@ import 'package:firebase_chat_app/ui/index.dart';
 import 'package:firebase_chat_app/utils/index.dart';
 
 class ChatScreen extends GetView<ChatController> {
-  const ChatScreen({Key key}) : super(key: key);
+  const ChatScreen(this.title, {Key key}) : super(key: key);
+  final String title;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: DefaultAppBar(
         title: Text(
-          'Test User',
+          title,
           style: context.textTheme.headline6,
         ),
       ),
-      body: Obx(
-        () => Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: kBottomNavigationBarHeight),
+            child: controller.obx(
+              (state) => ListView.builder(
                 controller: controller.scrollController,
-                itemCount: controller.list.length,
+                itemCount: state.length,
+                shrinkWrap: true,
+                padding: 10.0.padAll,
                 itemBuilder: (BuildContext context, int index) {
-                  final Chat data = controller.list[index];
+                  final Chat data = state[index];
                   final UserModel _user =
                       Get.find<UserController>().list.firstWhere(
                             (element) => element.id == data.uidFrom,
@@ -34,7 +38,9 @@ class ChatScreen extends GetView<ChatController> {
                           );
                   String _photoUrl = _user?.photoURL;
                   String _userName = _user?.displayName;
+                  bool _isMe = data.uidFrom == AuthService.to.currentUser.uid;
                   return ChatTile(
+                    isMe: _isMe,
                     id: data.id,
                     imageURL: _photoUrl,
                     messege: data.messege ?? '',
@@ -43,138 +49,24 @@ class ChatScreen extends GetView<ChatController> {
                   );
                 },
               ),
-            ),
-            controller.loading
-                ? CircularProgressIndicator()
-                : SizedBox.shrink(),
-          ],
-        ),
-      ),
-      bottomNavigationBar: ChatScreenInput(
-        controller: controller,
-      ),
-    );
-  }
-}
-
-class ChatTile extends StatelessWidget {
-  const ChatTile({
-    Key key,
-    @required this.name,
-    @required this.sent,
-    @required this.imageURL,
-    @required this.messege,
-    @required this.id,
-  }) : super(key: key);
-  final String name;
-  final String sent;
-  final String imageURL;
-  final String messege;
-  final String id;
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: context.width,
-      margin: 8.0.padAll,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            backgroundColor: Colors.blue,
-            child: ClipOval(
-              child: SizedBox.expand(
-                child: imageURL != null
-                    ? CachedNetworkImage(
-                        imageUrl: imageURL,
-                        fit: BoxFit.cover,
-                      )
-                    : Image.asset(
-                        '$ImagePath/defaultDark.png',
-                        fit: BoxFit.cover,
-                      ),
+              onEmpty: Center(
+                child: Text(
+                  'No Chat History found',
+                  style: context.textTheme.headline6.copyWith(
+                    color: context.textTheme.headline6.color.withOpacity(.5),
+                  ),
+                ),
               ),
             ),
           ),
-          15.0.sizedWidth,
-          Container(
-            width: context.width - 80,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      name,
-                      style: context.textTheme.headline6,
-                    ),
-                    10.0.sizedWidth,
-                    Text(
-                      sent,
-                      style: context.textTheme.caption,
-                    ),
-                  ],
-                ),
-                5.0.sizedHeight,
-                Text(
-                  messege,
-                  style: TextStyle(
-                    color: id == ERRORID ? context.theme.errorColor : null,
-                  ),
-                ),
-              ],
+          Positioned(
+            width: context.width,
+            bottom: 0,
+            child: ChatScreenInput(
+              controller: controller,
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class ChatScreenInput extends StatelessWidget {
-  ChatScreenInput({
-    Key key,
-    @required this.controller,
-  }) : super(key: key);
-  final ChatController controller;
-  @override
-  Widget build(BuildContext context) {
-    return Transform.translate(
-      offset: Offset(
-        0,
-        -1 * context.mediaQueryViewInsets.bottom,
-      ),
-      child: BottomAppBar(
-        color: context.theme.scaffoldBackgroundColor,
-        elevation: 0,
-        child: Padding(
-          padding: 10.0.padSymHORT,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Expanded(
-                flex: 3,
-                child: DefaultTextField(
-                  onFieldSubmitted: (_) => controller.sendMessege(context),
-                  tec: controller.tec,
-                  focusNode: controller.focusNode,
-                  decoration: InputDecoration(
-                    filled: false,
-                  ),
-                  label: 'Write something...',
-                ),
-              ),
-              5.0.sizedWidth,
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () => controller.sendMessege(context),
-                  child: Text('Send'),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

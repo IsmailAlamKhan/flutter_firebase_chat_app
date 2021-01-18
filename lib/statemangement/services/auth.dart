@@ -48,14 +48,14 @@ class AuthService extends GetxService {
     }
   }
 
-  Future<void> updateDeleteUser(bool isUpdate, {UserModel val}) async {
+  Future<void> confirmDeleteUser() async {
     final obscure = true.obs;
     final TextEditingController tec = TextEditingController();
 
     openDialog(
       child: AlertDialog(
         title: Text(
-          'Please enter your pasword and confirm to ${isUpdate ? 'update your profile' : 'Delete your profile'}',
+          'Please enter your pasword and confirm to ${'Delete your profile'}',
         ),
         scrollable: true,
         content: Column(
@@ -84,11 +84,8 @@ class AuthService extends GetxService {
               );
               try {
                 await auth.currentUser.reauthenticateWithCredential(credential);
-                if (isUpdate) {
-                  _updateUser(val);
-                } else {
-                  _deleteUser();
-                }
+
+                _deleteUser();
               } on FirebaseAuthException catch (e) {
                 showErrorSnackBar(
                   body: _firebaseService.firebaseErrors(e.code),
@@ -109,12 +106,7 @@ class AuthService extends GetxService {
   }
 
   Future<void> _updateFirebaseUser(UserModel val) async {
-    if (val.email != null && val.email != currentUser.email) {
-      await currentUser.updateEmail(
-        val.email,
-      );
-    } else if (val.displayName != null &&
-        val.displayName != currentUser.displayName) {
+    if (val.displayName != null && val.displayName != currentUser.displayName) {
       await currentUser.updateProfile(
         displayName: val.displayName,
       );
@@ -132,10 +124,14 @@ class AuthService extends GetxService {
           fileName: currentUser.uid,
         ),
       );
+    } else if (val.email != null && val.email != currentUser.email) {
+      await currentUser.updateEmail(
+        val.email,
+      );
     }
   }
 
-  Future<void> _updateUser(UserModel val) async {
+  Future<void> updateUser(UserModel val) async {
     if (val == null) return;
 
     if (val.displayName == currentUser.displayName &&
@@ -150,6 +146,7 @@ class AuthService extends GetxService {
     );
     try {
       await _updateFirebaseUser(val);
+      await currentUser.reload();
       final _user = UserModel(
         displayName: currentUser.displayName,
         email: currentUser.email,
@@ -160,7 +157,6 @@ class AuthService extends GetxService {
       final String msg = await UserCrud().updateuser(user: _user);
       Get.back();
       showSuccessSnackBar(body: msg);
-      currentUser.reload();
       Get.find<UserProfileController>().image = null;
       Get.find<UserProfileController>().imagePicked = false;
       Get.find<UserProfileController>().counter += 1;
@@ -200,6 +196,7 @@ class AuthService extends GetxService {
   }) async {
     try {
       UserCredential authResult;
+      trace(authState);
       switch (authState) {
         case AuthState.Login:
           authResult = await auth.signInWithEmailAndPassword(
@@ -220,7 +217,7 @@ class AuthService extends GetxService {
             displayName: username,
             emailVerified: false,
           );
-
+          verifyEmail();
           await UserCrud().createUser(
             user: user,
           );

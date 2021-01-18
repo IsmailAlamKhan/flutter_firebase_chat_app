@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 
 const ERRORID = 'ERROR';
 
-class ChatController extends GetxController {
+class ChatController extends GetxController with StateMixin<List<Chat>> {
   FocusNode focusNode;
   final crud = Get.put(ChatCrud());
   final _hasFocus = false.obs;
@@ -20,12 +20,28 @@ class ChatController extends GetxController {
   @override
   void onClose() {
     scrollController?.dispose();
+    _listWorker?.dispose();
     super.onClose();
   }
 
+  listOnChange(List<Chat> val) {
+    list.stream.handleError((onError) {
+      change(null, status: RxStatus.error(onError.toString()));
+    });
+    if (val.isEmpty) {
+      change(null, status: RxStatus.empty());
+    } else if (list.stream == null) {
+      change(null, status: RxStatus.loading());
+    } else {
+      change(val, status: RxStatus.success());
+    }
+  }
+
+  Worker _listWorker;
   @override
   void onInit() {
     list.bindStream(crud.chatStream());
+    _listWorker = ever(list, listOnChange);
     focusNode = FocusNode()
       ..addListener(() {
         _hasFocus(focusNode.hasFocus);

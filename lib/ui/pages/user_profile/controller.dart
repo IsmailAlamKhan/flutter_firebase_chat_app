@@ -41,7 +41,7 @@ class UserProfileController extends BaseController {
       emailVerified: authController.currentUser.emailVerified,
       photoURL: photoUrl,
     );
-    await authController.updateDeleteUser(true, val: _user);
+    await authController.updateUser(_user);
   }
 
   Worker userWorker;
@@ -151,37 +151,12 @@ class UserProfileController extends BaseController {
     );
   }
 
-  Widget profilePic() {
-    if (imagePicked) {
-      return Image.file(
-        image,
-        fit: BoxFit.cover,
-      );
-    }
-    if (authController.currentUser?.photoURL != null &&
-        authController.currentUser?.photoURL != '') {
-      return CachedNetworkImage(
-        imageUrl: authController.currentUser?.photoURL,
-        fit: BoxFit.cover,
-        placeholder: (_, __) => Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-    return Image.asset(
-      '$ImagePath/defaultDark.png',
-      fit: BoxFit.cover,
-    );
-  }
-
   void deleteProfile() {
     confirmDialog(
       wantLoading: false,
       onConfirm: (_) {
         Get.back();
-        authController.updateDeleteUser(
-          false,
-        );
+        authController.confirmDeleteUser();
       },
     );
   }
